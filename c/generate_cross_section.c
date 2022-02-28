@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
+#include <limits.h> //PATH_MAX
 
 #define CROSS_VBINS 1000000
 #define VMAX 1.0E5
@@ -20,16 +22,87 @@
  *
  */
 
+/* Got this from Stackexchange */
+int build_path(char *dest, size_t size, char *subdir, char *filename)
+{
+    // Don't assume the input is valid
+    if ( (dest == NULL) || (size < 1) || (filename == NULL) ) {
+        return 0;
+    }
 
-int main(){
+    // Make no subdir work  (sane default behavior)
+    if ( subdir == NULL ) {
+        subdir = "";
+    }
+
+    // Prevent buffer overruns by using a safe formatting function
+    size_t stored = snprintf(dest, size, "/%s/%s", subdir, filename);
+
+    // Returns success (true) if the path fit the buffer
+    return ((stored+1) <= size);
+}
+
+
+int main(int argc, char* argv[]){
 
   printf("Welcome!\n");
-
+  
+  int printhelp = 0;
+  char symlinkpath[PATH_MAX] = ".";
+  char actualpath [PATH_MAX];
+  char *ptr;
+  char *sptr;
+  
   /* Default values */
   double sigma0 = 0.1;
   int ps = 0; // power for scattering
   int pc = 0; // power for conversion; momentum ratios subtract 1 from this
 
+  for( int i = 0; i < argc; i++ ){
+
+    if (strncmp(argv[i], "--help", 6) == 0){
+      printhelp = 1;
+    }
+    if (strncmp(argv[i], "-h", 2) == 0){
+      printhelp = 1;
+    }
+    if (strncmp(argv[i], "-o", 2) == 0){
+      i++;
+      strcpy(symlinkpath, argv[i]);
+    }
+    if (strncmp(argv[i], "--sigma", 7) == 0){
+      i++;
+      sigma0 = strtod(argv[i], &sptr);
+    }
+    if (strncmp(argv[i], "-ps", 3) == 0) {
+      i++;
+      ps = strtol(argv[i], &sptr, 10);
+    }
+    if (strncmp(argv[i], "-pc", 3) == 0) {
+      i++;
+      pc = strtol(argv[i], &sptr, 10);
+    }
+
+  }
+
+  if(printhelp){
+
+    printf("Usage: %s [options]\n", argv[0]);
+    printf("  options:\n");
+    printf("\t --help (-h)\tprint options\n");
+    printf("\t --sigma\tset sigma0\n");
+    printf("\t -ps\tset scattering power law (default 0)\n");
+    printf("\t -pc\tset conversion power law (default 0)\n");
+    printf("\t -o\tset output path\n");
+    return 0;
+  }
+  ptr = realpath(symlinkpath, actualpath);
+  
+  printf("This will create a cross section table for sigma: %.2f \n", sigma0);
+  printf("and power laws of (%d, %d - 1).\n", ps, pc);
+  printf("Cross section files will be output to:\n");
+  printf("%s\n", actualpath);
+  
   double Dvlog = log( VMAX/VMIN ) / CROSS_VBINS;
   
   char elastic_filenames[NO_ELASTIC_FNAMES][MAX_FNAME_LENGTH] = {
@@ -52,8 +125,7 @@ int main(){
 
 
 
-  printf("This will create a cross section table for sigma: %.2f \n", sigma0);
-  printf("and power laws of (%d, %d - 1).\n", ps, pc);
+
   
   /* ELASTIC SCATTERING BLOCK */
 
@@ -80,12 +152,19 @@ int main(){
 
   }
 
-  
+  char fpath [PATH_MAX];
+
   for( int i = 0; i < NO_ELASTIC_FNAMES; i++) {
+
+    if( ! build_path( fpath, sizeof(fpath), actualpath, elastic_filenames[i] ) ){
+      fprintf( stderr, "ERROR: Invalid Path\n");
+      return 1;
+    }
+
 
     FILE *fp;
 
-    fp = fopen( elastic_filenames[i], "w+");
+    fp = fopen( fpath, "w+");
 
     for( int j = 0; j < CROSS_VBINS; j++ ) {
 
@@ -122,9 +201,14 @@ int main(){
   
   for( int i = 0; i < NO_INELASTIC_FNAMES; i++) {
 
+    if( ! build_path( fpath, sizeof(fpath), actualpath, inelastic_filenames[i] ) ){
+      fprintf( stderr, "ERROR: Invalid Path\n");
+      return 1;
+    }
+
     FILE *fp;
 
-    fp = fopen( inelastic_filenames[i], "w+");
+    fp = fopen( fpath, "w+");
 
     for( int j = 0; j < CROSS_VBINS; j++ ) {
 
