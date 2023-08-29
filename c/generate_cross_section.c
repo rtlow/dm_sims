@@ -13,6 +13,7 @@
 #define MAX_FNAME_LENGTH 30
 #define NO_ELASTIC_FNAMES 4
 #define NO_INELASTIC_FNAMES 8
+#define M2 -2 // For (-2, -2) case
 
 
 /*
@@ -58,6 +59,9 @@ int main(int argc, char* argv[]){
   int ps = 0; // power for scattering
   int pc = 0; // power for conversion; momentum ratios subtract 1 from this
 
+  int pst = 0; // input variables, will copy them later
+  int pct = 0;
+
   for( int i = 0; i < argc; i++ ){
 
     if (strncmp(argv[i], "--help", 6) == 0){
@@ -76,11 +80,11 @@ int main(int argc, char* argv[]){
     }
     if (strncmp(argv[i], "-ps", 3) == 0) {
       i++;
-      ps = strtol(argv[i], &sptr, 10);
+      pst = strtol(argv[i], &sptr, 10);
     }
     if (strncmp(argv[i], "-pc", 3) == 0) {
       i++;
-      pc = strtol(argv[i], &sptr, 10);
+      pct = strtol(argv[i], &sptr, 10);
     }
 
   }
@@ -96,10 +100,27 @@ int main(int argc, char* argv[]){
     printf("\t -o\tset output path\n");
     return 0;
   }
+
+  printf("This will create a cross section table for sigma: %.2f. \n", sigma0);
+
+  if ( (pst == pct) && (pct == M2) ){
+    printf("We are in the power law (%d, %d) case. Setting pc to (%d) exactly.\n", pst, pct, M2);
+    
+    // Doesn't hurt to be too careful.
+    ps = M2;
+    pc = M2;
+
+    printf("Power laws are (%d, %d).\n", pst, pct);
+  }
+  else {
+    //Do the minus 1 here
+    pc = pct-1;
+    printf("Power laws are (%d, %d - 1).\n", pst, pct);
+  }
+
+
   ptr = realpath(symlinkpath, actualpath);
   
-  printf("This will create a cross section table for sigma: %.2f \n", sigma0);
-  printf("and power laws of (%d, %d - 1).\n", ps, pc);
   printf("Cross section files will be output to:\n");
   printf("%s\n", actualpath);
   
@@ -188,7 +209,7 @@ int main(int argc, char* argv[]){
 
     double norm_vel = vel_cm / V_NORM; // normalizes velocity
 
-    double cross_sec = 0.5 * pow( norm_vel, pc - 1 ) * sigma0; // cross section at this velocity
+    double cross_sec = 0.5 * pow( norm_vel, pc ) * sigma0; // cross section at this velocity
 
     /* Storing the result */
 
