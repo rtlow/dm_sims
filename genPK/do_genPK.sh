@@ -21,7 +21,6 @@ for i in {0..7}; do
   file="$folder/$fname"
   if [ -f "$file" ]; then
     ~/code/GenPK/gen-pk -i "$file" -o "$outpath"
-
   else
     echo "$file not found."
   fi
