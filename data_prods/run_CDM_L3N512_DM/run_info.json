@@ -1,1 +1,1 @@
-{"run name": "run_CDM_L3N512_DM", "DM type": "CDM", "baryon_type": "DM", "otherInfo": [], "BoxSize": 3000, "NPart": 512, "redshifts": [99.0, 8.98, 8.5, 8.0, 7.49, 6.99, 6.5, 5.99, 5.49, 5.24, 4.5, 4.0, 3.5, 3.0, 2.5, 2.03, 1.5, 1.0, 0.5, 0.0]}
+{"run name": "run_CDM_L3N512_DM", "DM type": "CDM", "baryon_type": "DM", "otherInfo": [], "BoxSize": 3000, "NPart": 512, "Mass Resolution": 17308.393768342095, "Softening Length": 0.20204741379310345, "redshifts": [99.0, 8.98, 8.5, 8.0, 7.49, 6.99, 6.5, 5.99, 5.49, 5.24, 4.5, 4.0, 3.5, 3.0, 2.5, 2.03, 1.5, 1.0, 0.5, 0.0]}

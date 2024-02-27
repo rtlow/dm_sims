@@ -1,1 +1,1 @@
-{"run name": "run_CDM_L3N128_HY_var3", "DM type": "CDM", "baryon_type": "HY", "otherInfo": ["var3"], "BoxSize": 3000, "NPart": 128, "redshifts": [99.0, 8.96, 5.24, 3.98, 3.0, 2.02, 1.0, 0.0]}
+{"run name": "run_CDM_L3N128_HY_var3", "DM type": "CDM", "baryon_type": "HY", "otherInfo": ["var3"], "BoxSize": 3000, "NPart": 128, "Mass Resolution": 938752.499136091, "Softening Length": 0.8081896551724138, "redshifts": [99.0, 8.96, 5.24, 3.98, 3.0, 2.02, 1.0, 0.0]}

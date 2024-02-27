@@ -1,1 +1,1 @@
-{"run name": "run_2cDM_L3N512_HY_power00_sigma1", "DM type": "2cDM", "baryon_type": "HY", "powerLaws": [0, 0], "sigma0": 1.0, "otherInfo": [], "BoxSize": 3000, "NPart": 512, "redshifts": [99.0, 8.98, 5.24, 4.0, 3.0, 2.03]}
+{"run name": "run_2cDM_L3N512_HY_power00_sigma1", "DM type": "2cDM", "baryon_type": "HY", "powerLaws": [0, 0], "sigma0": 1.0, "otherInfo": [], "BoxSize": 3000, "NPart": 512, "Mass Resolution": 14668.007799001422, "Softening Length": 0.20204741379310345, "redshifts": [99.0, 8.98, 5.24, 4.0, 3.0, 2.03]}
