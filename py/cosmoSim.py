@@ -93,7 +93,7 @@ class cosmoSim:
             self.__base_path, 
             self.run_name, 
             f'PK-{part_type}-snap_00{self.redshifts.index(redshift)}.hdf5') 
-
+        
         bins, pk, dk = self.__get_genPK_data(pk_file, self.boxsize)
 
         k_ny = self.npart * np.pi / (self.boxsize / 1000) # k_ny in Mpc^-1
