@@ -92,7 +92,7 @@ class cosmoSim:
         pk_file = os.path.join(
             self.__base_path, 
             self.run_name, 
-            f'PK-{part_type}-snap_00{self.redshifts.index(redshift)}.hdf5') 
+            f'PK-{part_type}-snap_{self.redshifts.index(redshift):03}.hdf5') 
         
         bins, pk, dk = self.__get_genPK_data(pk_file, self.boxsize)
 
