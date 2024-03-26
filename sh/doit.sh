@@ -13,7 +13,7 @@
 # Which code directory
 i=5
 # Is this a restart run?
-RESTART=0
+RESTART=1
 # Point to output directory
 OUTDIR="/home/r408l055/scratch/output"
 # Point to final snapshot
@@ -25,13 +25,15 @@ RESTART_DIR="${OUTDIR}/live${i}/restartfiles/"
 JOBNAME=$SLURM_JOB_NAME
 PARAM="param_L3N256_${i}.txt"
 PARAM_PATH="../RUNS/710/${PARAM}"
-LOG_PATH='/home/r408l055/scratch/logs/LOG_${JOBNAME}_$(date +"%Y_%m_%d_%H_%M_%S")'
+LOG_PATH=/home/r408l055/scratch/logs/LOG_${JOBNAME}_$(date +"%Y_%m_%d_%H_%M_%S")
 
 # Flags for iteration go/no-go
-RESTART_EXISTS=false
-FINAL_SNAP_EXISTS=false
-RESTART_WRITTEN_SUCCESS=true
+RESTART_EXISTS=1
+N_FINAL_SNAP_EXISTS=0
+N_RUN_TERMINATED=0
+N_EXISTING_RUNS=0
 
+GO=0
 # Actual run starting code
 ~/remove_core.sh
 
@@ -46,39 +48,51 @@ N_RESTART=$(($SLURM_JOB_NUM_NODES*$SLURM_NTASKS_PER_NODE))
 
 # Check if the final snapshot was written
 if [ -f "$FINAL_SNAP" ]; then
-	FINAL_SNAP_EXISTS=true
+	N_FINAL_SNAP_EXISTS=0
 	echo "Final snapshot for Job $JOBNAME was written. Bye!"
+else
+  N_FINAL_SNAP_EXISTS=1
+  echo "Still snapshots to go..."
 fi
 
 # Check for the existence of restartfiles
 for i in $(seq 0 $((N_RESTART - 1))); do
-    rfile="restart.${i}"
+  rfile="restart.${i}"
 	file_name="${RESTART_DIR}/restart.${i}"
     if [ ! -e "$file_name" ]; then
         echo "File $rfile does not exist."
+        RESTART_EXISTS=0
     fi
-	else
-	    RESTART_EXISTS=true
 done
 
-# Check last half of logfile
-# for successful restart write
-total_lines=$(wc -l < $LOG_PATH)
-nlines=$((total_lines / 2 + 1))
-tail_output=$(tail -n $nlines $LOG_PATH)
-search_strings=('RESTART: Writing restart files' 'RESTART: Backup restart files' 'RESTART: load/save took ' 'RESTART: done.')
+TERMINATE_STRING="TERMINATE: ******!!!!!******"
 
-for string in "${search_strings[@]}"; do
-  if ! grep -q "$string" <<< "$tail_output"; then
-    RESTART_WRITTEN_SUCCESS=false
-	echo "Failed to rewrite restart files!"
-	echo "Check for stale restart files!"
-    break
-  fi
-done
+# Check if this run was successful
+if grep -q "$TERMINATE_STRING" "$LOG_PATH"; then
+  N_RUN_TERMINATED=0
+  echo "Job $JOBNAME was TERMINATED!!!!"
+  echo "Look for unintended output!"
+else
+  echo "Previous job good..."
+  N_RUN_TERMINATED=1
+fi
 
-# Iteration?
-if [[ $RESTART_EXISTS && $RESTART_WRITTEN_SUCCESS && ! $FINAL_SNAP_EXISTS  ]]; then
+# Check if other jobs with this name are running
+count=$( squeue --format=" %.30j " | grep -c "$JOBNAME" )
+
+if [ $count > 1 ]; then
+  N_EXISTING_RUNS=0
+  echo "Other runs exist! NO go!!!"
+else
+  N_EXISTING_RUNS=1
+  echo "No other runs."
+fi
+GO=$(($RESTART_EXISTS * $N_FINAL_SNAP_EXISTS * $N_RUN_TERMINATED * $N_EXISTING_RUNS ))
+
+echo "Go for restart? $GO"
+
+if (($GO)) ; then
+  echo "GO GO GO"
   sbatch doit-restart.sh
 else
   echo "Job $JOBNAME stopped."
