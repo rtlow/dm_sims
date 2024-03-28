@@ -41,7 +41,7 @@ class cosmoSim:
 
         self.plot_label = f'{self.dm_type}'
 
-        if self.dm_type == '2cDM':
+        if self.dm_type == '2cDM' or self.dm_type == 'SIDM':
             self.sigma0 = run_info['sigma0']
             self.powerLaws = run_info['powerLaws']
             self.plot_label += f' {self.powerLaws}, $\sigma_0=$ {self.sigma0}'
