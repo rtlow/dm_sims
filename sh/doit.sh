@@ -13,7 +13,7 @@
 # Which code directory
 i=5
 # Is this a restart run?
-RESTART=1
+RESTART=0
 # Point to output directory
 OUTDIR="/home/r408l055/scratch/output"
 # Point to final snapshot
@@ -32,6 +32,7 @@ RESTART_EXISTS=1
 N_FINAL_SNAP_EXISTS=0
 N_RUN_TERMINATED=0
 N_EXISTING_RUNS=0
+N_LOG_EMPTY=0
 
 GO=0
 # Actual run starting code
@@ -67,6 +68,18 @@ done
 
 TERMINATE_STRING="TERMINATE: ******!!!!!******"
 
+# Check if the log file is empty
+if [ -s $LOG_PATH ]; then
+  # The file is not-empty.
+  echo "Log file not empty..."
+  N_LOG_EMPTY=1
+else
+  # The file is empty.
+  echo "LOG FILE IS EMPTY!!!!"
+  N_LOG_EMPTY=0
+fi
+
+
 # Check if this run was successful
 if grep -q "$TERMINATE_STRING" "$LOG_PATH"; then
   N_RUN_TERMINATED=0
@@ -78,16 +91,16 @@ else
 fi
 
 # Check if other jobs with this name are running
-count=$( squeue --format=" %.30j " | grep -c "$JOBNAME" )
+count=$( squeue --format="%30j" | grep -c "$JOBNAME" )
 
-if [ $count > 1 ]; then
+if [[ $count > 1 ]]; then
   N_EXISTING_RUNS=0
   echo "Other runs exist! NO go!!!"
 else
   N_EXISTING_RUNS=1
   echo "No other runs."
 fi
-GO=$(($RESTART_EXISTS * $N_FINAL_SNAP_EXISTS * $N_RUN_TERMINATED * $N_EXISTING_RUNS ))
+GO=$(($RESTART_EXISTS * $N_FINAL_SNAP_EXISTS * $N_RUN_TERMINATED * $N_EXISTING_RUNS * $N_LOG_EMPTY ))
 
 echo "Go for restart? $GO"
 
