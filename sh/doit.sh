@@ -33,6 +33,7 @@ N_FINAL_SNAP_EXISTS=0
 N_RUN_TERMINATED=0
 N_EXISTING_RUNS=0
 N_LOG_EMPTY=0
+N_RUN_STOPPED=0
 
 GO=0
 # Actual run starting code
@@ -67,6 +68,7 @@ for i in $(seq 0 $((N_RESTART - 1))); do
 done
 
 TERMINATE_STRING="TERMINATE: ******!!!!!******"
+ENDRUN_STRING="endrun called, calling MPI_Finalize()"
 
 # Check if the log file is empty
 if [ -s $LOG_PATH ]; then
@@ -86,8 +88,18 @@ if grep -q "$TERMINATE_STRING" "$LOG_PATH"; then
   echo "Job $JOBNAME was TERMINATED!!!!"
   echo "Look for unintended output!"
 else
-  echo "Previous job good..."
+  echo "Previous run not terminated..."
   N_RUN_TERMINATED=1
+fi
+
+# Check if this run was successful
+if grep -q "$ENDRUN_STRING" "$LOG_PATH"; then
+  N_RUN_STOPPED=0
+  echo "Job $JOBNAME was STOPPED!!!!"
+  echo "Check parameters!"
+else
+  echo "Previous run not stopped..."
+  N_RUN_STOPPED=1
 fi
 
 # Check if other jobs with this name are running
