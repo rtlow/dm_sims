@@ -1,0 +1,6 @@
+
+% SIDM Parameters
+DtimeFac                                          0.0025
+DtimeFacLim                                       0.025
+SIDMDesNumNgb                                     32
+SIDMMaxNumNgbDeviation                            5
