@@ -1,29 +1,29 @@
 #!/bin/bash
-#SBATCH --nodes={__NODES__}
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=32
-#SBATCH --mem-per-cpu={__MEMSIZE__}
+#SBATCH --mem-per-cpu=8g
 #SBATCH --time=6:00:00
 ##SBATCH --mail-user=rtlow@ku.edu
 ##SBATCH --mail-type=ALL
-#SBATCH --job-name={__JOBSTRING__}
+#SBATCH --job-name=2cDM_L3N256_DM_power00_sigma1_dir_4
 #SBATCH --partition=sixhour
 #SBATCH --constraint "intel"
 #SBATCH --constraint=ib
 
 # Which code directory
-i={__CODE_DIR__}
+i=4
 # Is this a restart run?
-RESTART={__RESTART__}
+RESTART=0
 # Point to output directory
 OUTDIR="/home/r408l055/scratch/output"
 # Point to final snapshot
-FINAL_SNAP="${OUTDIR}/{__JOBSTRING__}/snap_007.hdf5"
+FINAL_SNAP="${OUTDIR}/2cDM_L3N256_DM_power00_sigma1_dir_4/snap_007.hdf5"
 
 
 # Modification is rarely needed
-RESTART_DIR="${OUTDIR}/{__JOBSTRING__}/restartfiles/"
+RESTART_DIR="${OUTDIR}/2cDM_L3N256_DM_power00_sigma1_dir_4/restartfiles/"
 JOBNAME=$SLURM_JOB_NAME
-PARAM='{__PARAM_FILE__}'
+PARAM='2cDM_L3N256_DM_power00_sigma1_dir_4'
 PARAM_PATH="../RUNS/boxes/${PARAM}"
 LOG_PATH=/home/r408l055/scratch/logs/LOG_${JOBNAME}_$(date +"%Y_%m_%d_%H_%M_%S")
 
