@@ -1,6 +1,6 @@
 
 OutputDir        ./ICs               % Directory for output
-FileBase         IC-L3N256          % Base-filename of output files
+FileBase         IC-L3N256-8          % Base-filename of output files
 
 
 %GlassFile        ./glass-files/glass2x2-multi-interleaved-gas.dat     % Glass-File

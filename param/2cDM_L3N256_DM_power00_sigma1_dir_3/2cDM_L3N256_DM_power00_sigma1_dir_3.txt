@@ -1,5 +1,5 @@
 InitCondFile                                      /home/r408l055/projects/Medvedev/IC/IC-L3N256-3
-OutputDir                                         /home/r408l055/scratch/output/live3
+OutputDir                                         /home/r408l055/scratch/output/2cDM_L3N256_DM_power00_sigma1_dir_3
 SnapshotFileBase                                  snap
 OutputListFilename                                ../TNGfiles/ExpansionList_L3N256
 ICFormat                                          3

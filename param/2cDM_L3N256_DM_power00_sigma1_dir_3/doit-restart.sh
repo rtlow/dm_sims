@@ -23,7 +23,7 @@ FINAL_SNAP="${OUTDIR}/2cDM_L3N256_DM_power00_sigma1_dir_3/snap_007.hdf5"
 # Modification is rarely needed
 RESTART_DIR="${OUTDIR}/2cDM_L3N256_DM_power00_sigma1_dir_3/restartfiles/"
 JOBNAME=$SLURM_JOB_NAME
-PARAM='2cDM_L3N256_DM_power00_sigma1_dir_3'
+PARAM='2cDM_L3N256_DM_power00_sigma1_dir_3.txt'
 PARAM_PATH="../RUNS/boxes/${PARAM}"
 LOG_PATH=/home/r408l055/scratch/logs/LOG_${JOBNAME}_$(date +"%Y_%m_%d_%H_%M_%S")
 
