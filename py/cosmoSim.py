@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import json
+import warnings
 
 class cosmoSim:
     """
@@ -75,6 +76,27 @@ class cosmoSim:
         
         return bins, pk, dk
     
+    def __redshift_to_index(self, redshift, tolerance=0.1):
+        """
+        Converts a given redshift to list index
+
+        Args:
+            redshift (float): redshift of snapshot
+        
+        Returns:
+            index (int): index into redshift table
+        """
+
+        redshift_arr = np.array(self.redshifts)
+        diffs = np.abs(redshift_arr - redshift)
+        idx = diffs.argmin()
+        diff = np.amin(diffs)
+
+        if diff > tolerance:
+            warnings.warn(f"WARNING: Requested redshift {redshift} is not within tolerance {tolerance} of snapshot redshift {self.redshifts[idx]}!")
+
+        return idx
+    
     def load_power_spectra(self, redshift, part_type='DM'):
         """
         Loads tabulated power spectra from disk for this run
@@ -89,10 +111,13 @@ class cosmoSim:
             pk (np.array(float)): 1D power spectrum Mpc^3/h
             dk (np.array(float)): 1D dimensionless power spectrum
         """
+
+        idx = self.__redshift_to_index(redshift)
+
         pk_file = os.path.join(
             self.__base_path, 
             self.run_name, 
-            f'PK-{part_type}-snap_{self.redshifts.index(redshift):03}.hdf5') 
+            f'PK-{part_type}-snap_{idx:03}.hdf5') 
         
         bins, pk, dk = self.__get_genPK_data(pk_file, self.boxsize)
 
@@ -111,10 +136,13 @@ class cosmoSim:
             mbins (np.array(float)): logarithmic mass bins in M_sun
             m (np.array(float)): cumulative halo count in bins
         """
+
+        idx = self.__redshift_to_index(redshift)
+
         mbins, m = np.loadtxt( 
             os.path.join(self.__base_path, 
                          self.run_name, 
-                         f'mass_profile_{self.redshifts.index(redshift)}.txt') 
+                         f'mass_profile_{idx}.txt') 
             )
         
         return mbins, m
@@ -130,10 +158,13 @@ class cosmoSim:
             vbins (np.array(float)): logarithmic velocity bins in km/s
             v (np.array(float)): cumulative halo count in bins
         """
+
+        idx = self.__redshift_to_index(redshift)
+
         vbins, v = np.loadtxt( 
             os.path.join(self.__base_path, 
                          self.run_name, 
-                         f'vel_profile_{self.redshifts.index(redshift)}.txt') 
+                         f'vel_profile_{idx}.txt') 
             )
         
         return vbins, v
