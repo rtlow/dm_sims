@@ -2,6 +2,7 @@ import os
 import numpy as np
 import json
 import warnings
+from scipy.interpolate import interp1d
 
 class cosmoSim:
     """
@@ -97,6 +98,25 @@ class cosmoSim:
 
         return idx
     
+    def __interpolate(self, domain, range):
+        """
+        Creates an interpolation function for range over domain
+
+        Args:
+            domain (np.array(float)): domain of function
+            range (np.array(float)): range of function
+        
+        Returns:
+            interpf (function): an interpolation function
+            lims (n.array(float)): the bounds of validity for the interpolation function
+                            packaged in the form [inf, sup]    
+        """
+
+        inf = np.amin(domain)
+        sup = np.amax(domain)
+
+        return interp1d(domain, range), np.array([inf, sup])
+    
     def load_power_spectra(self, redshift, part_type='DM'):
         """
         Loads tabulated power spectra from disk for this run
@@ -125,6 +145,28 @@ class cosmoSim:
 
         return bins, pk, dk, k_ny
     
+    def interp_power_spectra(self, redshift, part_type='DM'):
+        """
+        Loads tabulated power spectra from disk and interpolates
+        the result
+
+        Args:
+            redshift (float): redshift of snapshot
+            part_type (str): particle type to load
+                choices are ["DM", "by"] 
+
+        Returns:
+            lims (np.array(float)): the bounds of validity for the interpolation function
+                                    packaged in the form [inf, sup]  
+            pk_interp (function): 1D power spectrum interpolation function Mpc^3/h
+            dk_interp (function): 1D dimensionless power spectrum interpolation function
+        """
+        bins, pk, dk, k_ny = self.load_power_spectra(redshift, part_type)
+        pk_interp, lims = self.__interpolate(bins, pk)
+        dk_interp, lims = self.__interpolate(bins, dk)
+
+        return lims, pk_interp, dk_interp, k_ny
+    
     def load_mass_profile(self, redshift):
         """
         Loads tabulated halo mass function from disk for this run
@@ -147,6 +189,25 @@ class cosmoSim:
         
         return mbins, m
     
+    def interp_mass_profile(self, redshift):
+        """
+        Loads tabulated halo mass function from disk
+        and interpolates the result
+
+        Args:
+            redshift (float): redshift of snapshot
+
+        Returns:
+            lims (np.array(float)): the bounds of validity for the interpolation function
+                                    packaged in the form [inf, sup] 
+            m_interp (function): mass function interpolation function
+        """
+        mbins, m = self.load_mass_profile(redshift)
+
+        m_interp, lims = self.__interpolate(mbins, m)
+
+        return m_interp, lims
+    
     def load_vel_profile(self, redshift):
         """
         Loads tabulated circular velocity function from disk for this run
@@ -168,3 +229,22 @@ class cosmoSim:
             )
         
         return vbins, v
+    
+    def interp_vels_profile(self, redshift):
+        """
+        Loads tabulated circular velocity function from disk
+        and interpolates the result
+
+        Args:
+            redshift (float): redshift of snapshot
+
+        Returns:
+            lims (np.array(float)): the bounds of validity for the interpolation function
+                                    packaged in the form [inf, sup] 
+            v_interp (function): velocity function interpolation function
+        """
+        vbins, v = self.load_vel_profile(redshift)
+
+        v_interp, lims = self.__interpolate(vbins, v)
+
+        return v_interp, lims
