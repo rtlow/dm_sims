@@ -248,3 +248,15 @@ class cosmoSim:
         v_interp, lims = self.__interpolate(vbins, v)
 
         return v_interp, lims
+    
+    def load_mass_density(self, redshift, subhalo_idx):
+
+        idx = self.__redshift_to_index(redshift)
+
+        rbins, densities = np.loadtxt(
+            os.path.join(self.__base_path,
+                         self.run_name,
+                         f'subhalo_densities_{idx}',
+                         f'subhalo_{subhalo_idx}')
+            )
+        return rbins, densities
