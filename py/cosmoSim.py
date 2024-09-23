@@ -206,7 +206,7 @@ class cosmoSim:
 
         m_interp, lims = self.__interpolate(mbins, m)
 
-        return m_interp, lims
+        return lims, m_interp
     
     def load_vel_profile(self, redshift):
         """
@@ -247,9 +247,21 @@ class cosmoSim:
 
         v_interp, lims = self.__interpolate(vbins, v)
 
-        return v_interp, lims
+        return lims, v_interp
     
     def load_mass_density(self, redshift, subhalo_idx):
+        """
+        Loads tabulated halo mass density profile from disk
+
+        Args:
+            redshift (float): redshift of snapshot
+            subhalo_idx (int): index of subhalo with 0 being largest,
+                               1 second largest, etc.
+            
+            Returns:
+                rbins (np.array(float)): radius bins densities were calculated within
+                densities (np.array(float)): Mass density within each bin in 10e10 M_sun/kpc^3
+        """
 
         idx = self.__redshift_to_index(redshift)
 
@@ -257,6 +269,6 @@ class cosmoSim:
             os.path.join(self.__base_path,
                          self.run_name,
                          f'subhalo_densities_{idx}',
-                         f'subhalo_{subhalo_idx}')
+                         f'subhalo_{subhalo_idx}.txt')
             )
         return rbins, densities
