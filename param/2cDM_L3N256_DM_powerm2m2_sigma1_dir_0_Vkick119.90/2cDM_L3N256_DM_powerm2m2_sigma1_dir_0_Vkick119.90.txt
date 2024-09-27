@@ -1,5 +1,5 @@
 InitCondFile                                      /home/r408l055/projects/Medvedev/IC/IC-L3N256
-OutputDir                                         /home/r408l055/scratch/output/{$JOBSTRING}
+OutputDir                                         /home/r408l055/scratch/output/2cDM_L3N256_DM_powerm2m2_sigma1_dir_0_Vkick119.90
 SnapshotFileBase                                  snap
 OutputListFilename                                ../TNGfiles/ExpansionList_L3N256
 ICFormat                                          3
@@ -8,20 +8,20 @@ TimeLimitCPU                                      21600 %6hour
 CpuTimeBetRestartFile                             14400 %4hour
 ResubmitOn                                        1
 ResubmitCommand                                   /home/r408l055/projects/SIDM/code/doit-restart.sh
-MaxMemSize                                        {$MEMSIZE}
+MaxMemSize                                        8000
 TimeBegin                                         0.01
 TimeMax                                           1
 ComovingIntegrationOn                             1
 PeriodicBoundariesOn                              1
 
-CoolingOn                                         {$HY_FLAG}
-StarformationOn                                   {$HY_FLAG}
+CoolingOn                                         0
+StarformationOn                                   0
 
 Omega0                                            0.301712
 OmegaLambda                                       0.698288
-OmegaBaryon                                       {$OMEGA_BARYON}
+OmegaBaryon                                       0
 HubbleParam                                       0.6909
-BoxSize                                           {$BOXSIZE}  % length in kpc
+BoxSize                                           3000  % length in kpc
 OutputListOn                                      1
 TimeBetSnapshot                                   0
 TimeOfFirstSnapshot                               0
@@ -64,19 +64,19 @@ DesLinkNgb                                        20
 ActivePartFracForNewDomainDecomp                  .005
 
 % Softening Lengths
-SofteningComovingType0                            {$SOFTENING_LENGTH}
-SofteningComovingType1                            {$SOFTENING_LENGTH}
-SofteningComovingType2                            {$SOFTENING_LENGTH}
-SofteningComovingType3                            {$SOFTENING_LENGTH}
-SofteningComovingType4                            {$SOFTENING_LENGTH}
-SofteningComovingType5                            {$SOFTENING_LENGTH}
+SofteningComovingType0                            0.4040948275862069
+SofteningComovingType1                            0.4040948275862069
+SofteningComovingType2                            0.4040948275862069
+SofteningComovingType3                            0.4040948275862069
+SofteningComovingType4                            0.4040948275862069
+SofteningComovingType5                            0.4040948275862069
 
-SofteningMaxPhysType0                             {$SOFTENING_LENGTH_HALF}
-SofteningMaxPhysType1                             {$SOFTENING_LENGTH_HALF}
-SofteningMaxPhysType2                             {$SOFTENING_LENGTH_HALF}
-SofteningMaxPhysType3                             {$SOFTENING_LENGTH_HALF}
-SofteningMaxPhysType4                             {$SOFTENING_LENGTH_HALF}
-SofteningMaxPhysType5                             {$SOFTENING_LENGTH_HALF}
+SofteningMaxPhysType0                             0.20204741379310345
+SofteningMaxPhysType1                             0.20204741379310345
+SofteningMaxPhysType2                             0.20204741379310345
+SofteningMaxPhysType3                             0.20204741379310345
+SofteningMaxPhysType4                             0.20204741379310345
+SofteningMaxPhysType5                             0.20204741379310345
 
 SofteningTypeOfPartType0                          0
 SofteningTypeOfPartType1                          1
@@ -100,3 +100,8 @@ RefinementCriterion		1
 DerefinementCriterion		1
 
 %#CrossSectionPerMass_in_cgs      1.0
+% SIDM Parameters
+DtimeFac                                          0.0025
+DtimeFacLim                                       0.025
+SIDMDesNumNgb                                     32
+SIDMMaxNumNgbDeviation                            5
