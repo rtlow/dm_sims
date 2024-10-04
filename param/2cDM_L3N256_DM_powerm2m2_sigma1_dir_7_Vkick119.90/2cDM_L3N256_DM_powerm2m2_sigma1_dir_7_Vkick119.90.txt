@@ -1,4 +1,4 @@
-InitCondFile                                      /home/r408l055/projects/Medvedev/IC/IC-L3N256
+InitCondFile                                      /home/r408l055/projects/Medvedev/IC/L3N256
 OutputDir                                         /home/r408l055/scratch/output/2cDM_L3N256_DM_powerm2m2_sigma1_dir_7_Vkick119.90
 SnapshotFileBase                                  snap
 OutputListFilename                                ../TNGfiles/ExpansionList_L3N256
