@@ -47,6 +47,12 @@ class cosmoSim:
             self.sigma0 = run_info['sigma0']
             self.powerLaws = run_info['powerLaws']
             self.plot_label += f' {self.powerLaws}, $\sigma_0=$ {self.sigma0}'
+        if self.dm_type == '2cDM':
+            if 'Vkick' in run_info.keys():
+                self.Vkick = run_info['Vkick']
+            else:
+                warnings.warn('Vkick not explicitly set! Assuming 100 km/s...')
+                self.Vkick = 100.
 
     def __calculate_fourier_conversion(self, Boxsize):
         '''
