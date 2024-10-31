@@ -53,6 +53,7 @@ class cosmoSim:
             else:
                 warnings.warn('Vkick not explicitly set! Assuming 100 km/s...')
                 self.Vkick = 100.
+        self.run_info = run_info
 
     def __calculate_fourier_conversion(self, Boxsize):
         '''
@@ -123,6 +124,32 @@ class cosmoSim:
 
         return interp1d(domain, range), np.array([inf, sup])
     
+    def load_subhalo_info(self, redshift):
+        """
+        Loads tabulated subhalo information
+
+        Args:
+            redshift (float): redshift of snapshot
+
+        Returns:
+            Vmax (np.array(float)): Vmax for all subhalos
+            Rmax (np.array(float)): Radius at which Vmax is achieved
+            subhaloMass (np.array(float)): Subhalo mass, defined by subfind SubhaloMass
+            halfMassRad (np.array(float)): Subhalo half mass radius
+            massInHalfRad (np.array(float)): Mass contained within half mass radius
+            massInRad (np.array(float)): Mass contained within 2 * half mass radius
+        """
+        idx = self.__redshift_to_index(redshift)
+
+        Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad = np.loadtxt( 
+            os.path.join(
+            self.__base_path, 
+            self.run_name, 
+            f'subhalo_stats_{idx}.txt') 
+            )
+        
+        return Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad
+        
     def load_power_spectra(self, redshift, part_type='DM'):
         """
         Loads tabulated power spectra from disk for this run
