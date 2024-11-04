@@ -15,9 +15,8 @@
 
 #Number of nodes and MPI tasks per node:
 #SBATCH --nodes={__NODES__}
-
-#SBATCH --mem=0 # get all memory on each node
-#SBATCH --ntasks=128 # less tasks than cores available, hopefully will give more mem per cpu
+#SBATCH --ntasks-per-node=64
+#SBATCH --mem-per-cpu={__MEMSIZE__}
 
 #SBATCH --constraint=centos7
 
@@ -57,9 +56,11 @@ GO=0
 # Actual run starting code
 ~/remove_core.sh
 
-module load hdf5/1.10.5
-module load openmpi/4.0
-mpiexec ./Arepo $PARAM_PATH $RESTART > $LOG_PATH
+source /home/rtlow/modules.sh
+
+mpiexec --mca opal_warn_on_missing_libcuda 0 \
+       --mca btl '^openib' --mca pml ucx \
+       -np $SLURM_NTASKS ./Arepo $PARAM_PATH $RESTART > $LOG_PATH
 
 ~/remove_core.sh
 

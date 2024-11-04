@@ -8,7 +8,7 @@ TimeLimitCPU                                      432000 %5day
 CpuTimeBetRestartFile                             43200 %12hour
 ResubmitOn                                        1
 ResubmitCommand                                   /home/rtlow/SIDM/code/doit-restart.sh
-MaxMemSize                                        8000
+MaxMemSize                                        5000
 TimeBegin                                         0.01
 TimeMax                                           1
 ComovingIntegrationOn                             1
