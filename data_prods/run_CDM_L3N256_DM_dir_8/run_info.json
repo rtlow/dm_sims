@@ -1,1 +1,1 @@
-{"run name": "run_CDM_L3N256_DM_dir_8", "DM type": "CDM", "baryon_type": "DM", "otherInfo": ["dir", "8"], "BoxSize": 3000, "NPart": 256, "Mass Resolution": 138467.15014673676, "Softening Length": 0.4040948275862069, "redshifts": [99.0, 8.96, 5.24, 3.99, 3.0, 2.03, 1.0, 0.0]}
+{"run name": "run_CDM_L3N256_DM_dir_8", "DM type": "CDM", "baryon_type": "DM", "otherInfo": ["dir", "8"], "BoxSize": 3000, "NPart": 256, "Mass Resolution": [138467.15014673676], "Softening Length": 0.4040948275862069, "redshifts": [99.0, 8.96, 5.24, 3.99, 3.0, 2.03, 1.0, 0.0]}

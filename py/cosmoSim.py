@@ -124,6 +124,19 @@ class cosmoSim:
 
         return interp1d(domain, range), np.array([inf, sup])
     
+    def get_nearest_redshift(self, r):
+        """
+        Convenience function to return the nearest redshift to the requested value
+        
+        Args:
+            r (float): requested redshift
+
+        Returns:
+            nearest (float): the redshift of the snapshot with closest redshift to r
+        """
+
+        return self.redshifts[self.__redshift_to_index(r)]
+
     def load_subhalo_info(self, redshift):
         """
         Loads tabulated subhalo information
