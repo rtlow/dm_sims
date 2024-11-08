@@ -94,7 +94,7 @@ class cosmoSim:
         Returns:
             index (int): index into redshift table
         """
-
+        max_tolerance = 0.5
         redshift_arr = np.array(self.redshifts)
         diffs = np.abs(redshift_arr - redshift)
         idx = diffs.argmin()
@@ -102,6 +102,8 @@ class cosmoSim:
 
         if diff > tolerance:
             warnings.warn(f"WARNING: Requested redshift {redshift} is not within tolerance {tolerance} of snapshot redshift {self.redshifts[idx]}!")
+        if diff > max_tolerance:
+            raise Exception(f"ERROR: Requested redshift {redshift} is not within {max_tolerance} of any snapshot! Snapshot may not exist!")
 
         return idx
     
