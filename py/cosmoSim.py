@@ -184,7 +184,7 @@ class cosmoSim:
 
         if part_type == 'all':
             pk = dk = 0
-            for ptype in ["DM", "by", "st"]:
+            for ptype in ["DM", "by"]:
                 try:
                     pk_file = os.path.join(
                         self.__base_path,
