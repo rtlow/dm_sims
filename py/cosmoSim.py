@@ -64,33 +64,33 @@ class cosmoSim:
 
         k_conv = 2*np.pi / Boxsize
         p_conv = (Boxsize / (2 * np.pi))**3
-        
+
         return k_conv, p_conv
-    
+
     def __get_genPK_data(self, fpath, boxsize):
 
         k_conv, p_conv = self.__calculate_fourier_conversion(boxsize)
 
         genPK = np.loadtxt(fpath)
-        
+
         bins = genPK[:, 0]
         pk = genPK[:, 1]
-        
+
         dk = pk * (2 * np.pi)**3 * (4 * np.pi) * bins**3
-        
+
         bins = genPK[:, 0] * k_conv
-        
+
         pk = genPK[:, 1] * p_conv
-        
+
         return bins, pk, dk
-    
+
     def __redshift_to_index(self, redshift, tolerance=0.1):
         """
         Converts a given redshift to list index
 
         Args:
             redshift (float): redshift of snapshot
-        
+
         Returns:
             index (int): index into redshift table
         """
@@ -106,7 +106,7 @@ class cosmoSim:
             raise Exception(f"ERROR: Requested redshift {redshift} is not within {max_tolerance} of any snapshot! Snapshot may not exist!")
 
         return idx
-    
+
     def __interpolate(self, domain, range):
         """
         Creates an interpolation function for range over domain
@@ -114,22 +114,22 @@ class cosmoSim:
         Args:
             domain (np.array(float)): domain of function
             range (np.array(float)): range of function
-        
+
         Returns:
             interpf (function): an interpolation function
             lims (n.array(float)): the bounds of validity for the interpolation function
-                            packaged in the form [inf, sup]    
+                            packaged in the form [inf, sup]
         """
 
         inf = np.amin(domain)
         sup = np.amax(domain)
 
         return interp1d(domain, range), np.array([inf, sup])
-    
+
     def get_nearest_redshift(self, r):
         """
         Convenience function to return the nearest redshift to the requested value
-        
+
         Args:
             r (float): requested redshift
 
@@ -156,15 +156,15 @@ class cosmoSim:
         """
         idx = self.__redshift_to_index(redshift)
 
-        Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad = np.loadtxt( 
+        Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad = np.loadtxt(
             os.path.join(
-            self.__base_path, 
-            self.run_name, 
-            f'subhalo_stats_{idx}.txt') 
+            self.__base_path,
+            self.run_name,
+            f'subhalo_stats_{idx}.txt')
             )
-        
+
         return Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad
-        
+
     def load_power_spectra(self, redshift, part_type='DM'):
         """
         Loads tabulated power spectra from disk for this run
@@ -172,7 +172,7 @@ class cosmoSim:
         Args:
             redshift (float): redshift of snapshot
             part_type (str): particle type to load
-                choices are ["DM", "by"] 
+                choices are ["DM", "by", "st", "all"]
 
         Returns:
             bins (np.array(float)): power spectrum bins
@@ -182,17 +182,31 @@ class cosmoSim:
 
         idx = self.__redshift_to_index(redshift)
 
-        pk_file = os.path.join(
-            self.__base_path, 
-            self.run_name, 
-            f'PK-{part_type}-snap_{idx:03}.hdf5') 
-        
-        bins, pk, dk = self.__get_genPK_data(pk_file, self.boxsize)
+        if part_type == 'all':
+            pk = dk = 0
+            for ptype in ["DM", "by", "st"]:
+                try:
+                    pk_file = os.path.join(
+                        self.__base_path,
+                        self.run_name,
+                        f'PK-{ptype}-snap_{idx:03}.hdf5')
+                    bins, p, d = self.__get_genPK_data(pk_file, self.boxsize)
+                    pk += p
+                    dk += d
+                except:
+                    warnings.warn(f'Pk File does NOT exist for type {ptype}')
+                    continue
+        else:
+            pk_file = os.path.join(
+                self.__base_path,
+                self.run_name,
+                f'PK-{part_type}-snap_{idx:03}.hdf5')
+            bins, pk, dk = self.__get_genPK_data(pk_file, self.boxsize)
 
         k_ny = self.npart * np.pi / (self.boxsize / 1000) # k_ny in Mpc^-1
 
         return bins, pk, dk, k_ny
-    
+
     def interp_power_spectra(self, redshift, part_type='DM'):
         """
         Loads tabulated power spectra from disk and interpolates
@@ -201,11 +215,11 @@ class cosmoSim:
         Args:
             redshift (float): redshift of snapshot
             part_type (str): particle type to load
-                choices are ["DM", "by"] 
+                choices are ["DM", "by", "st", "all"]
 
         Returns:
             lims (np.array(float)): the bounds of validity for the interpolation function
-                                    packaged in the form [inf, sup]  
+                                    packaged in the form [inf, sup]
             pk_interp (function): 1D power spectrum interpolation function Mpc^3/h
             dk_interp (function): 1D dimensionless power spectrum interpolation function
         """
@@ -214,7 +228,7 @@ class cosmoSim:
         dk_interp, lims = self.__interpolate(bins, dk)
 
         return lims, pk_interp, dk_interp, k_ny
-    
+
     def load_mass_profile(self, redshift):
         """
         Loads tabulated halo mass function from disk for this run
@@ -229,14 +243,14 @@ class cosmoSim:
 
         idx = self.__redshift_to_index(redshift)
 
-        mbins, m = np.loadtxt( 
-            os.path.join(self.__base_path, 
-                         self.run_name, 
-                         f'mass_profile_{idx}.txt') 
+        mbins, m = np.loadtxt(
+            os.path.join(self.__base_path,
+                         self.run_name,
+                         f'mass_profile_{idx}.txt')
             )
-        
+
         return mbins, m
-    
+
     def interp_mass_profile(self, redshift):
         """
         Loads tabulated halo mass function from disk
@@ -247,7 +261,7 @@ class cosmoSim:
 
         Returns:
             lims (np.array(float)): the bounds of validity for the interpolation function
-                                    packaged in the form [inf, sup] 
+                                    packaged in the form [inf, sup]
             m_interp (function): mass function interpolation function
         """
         mbins, m = self.load_mass_profile(redshift)
@@ -255,7 +269,7 @@ class cosmoSim:
         m_interp, lims = self.__interpolate(mbins, m)
 
         return lims, m_interp
-    
+
     def load_vel_profile(self, redshift):
         """
         Loads tabulated circular velocity function from disk for this run
@@ -270,14 +284,14 @@ class cosmoSim:
 
         idx = self.__redshift_to_index(redshift)
 
-        vbins, v = np.loadtxt( 
-            os.path.join(self.__base_path, 
-                         self.run_name, 
-                         f'vel_profile_{idx}.txt') 
+        vbins, v = np.loadtxt(
+            os.path.join(self.__base_path,
+                         self.run_name,
+                         f'vel_profile_{idx}.txt')
             )
-        
+
         return vbins, v
-    
+
     def interp_vels_profile(self, redshift):
         """
         Loads tabulated circular velocity function from disk
@@ -288,7 +302,7 @@ class cosmoSim:
 
         Returns:
             lims (np.array(float)): the bounds of validity for the interpolation function
-                                    packaged in the form [inf, sup] 
+                                    packaged in the form [inf, sup]
             v_interp (function): velocity function interpolation function
         """
         vbins, v = self.load_vel_profile(redshift)
@@ -296,7 +310,7 @@ class cosmoSim:
         v_interp, lims = self.__interpolate(vbins, v)
 
         return lims, v_interp
-    
+
     def load_mass_density(self, redshift, subhalo_idx):
         """
         Loads tabulated halo mass density profile from disk
@@ -305,7 +319,7 @@ class cosmoSim:
             redshift (float): redshift of snapshot
             subhalo_idx (int): index of subhalo with 0 being largest,
                                1 second largest, etc.
-            
+
             Returns:
                 rbins (np.array(float)): radius bins densities were calculated within
                 densities (np.array(float)): Mass density within each bin in 10e10 M_sun/kpc^3
