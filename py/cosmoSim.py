@@ -172,7 +172,7 @@ class cosmoSim:
         Args:
             redshift (float): redshift of snapshot
             part_type (str): particle type to load
-                choices are ["DM", "by", "st", "all"]
+                choices are ["DM", "by", "st"]
 
         Returns:
             bins (np.array(float)): power spectrum bins
@@ -181,29 +181,47 @@ class cosmoSim:
         """
 
         idx = self.__redshift_to_index(redshift)
-
-        if part_type == 'all':
-            pk = dk = 0
-            for ptype in ["DM", "by"]:
-                try:
-                    pk_file = os.path.join(
-                        self.__base_path,
-                        self.run_name,
-                        f'PK-{ptype}-snap_{idx:03}.hdf5')
-                    bins, p, d = self.__get_genPK_data(pk_file, self.boxsize)
-                    pk += p
-                    dk += d
-                except:
-                    warnings.warn(f'Pk File does NOT exist for type {ptype}')
-                    continue
-        else:
-            pk_file = os.path.join(
-                self.__base_path,
-                self.run_name,
-                f'PK-{part_type}-snap_{idx:03}.hdf5')
-            bins, pk, dk = self.__get_genPK_data(pk_file, self.boxsize)
+        pk_file = os.path.join(
+            self.__base_path,
+            self.run_name,
+            f'PK-{part_type}-snap_{idx:03}.hdf5')
+        bins, pk, dk = self.__get_genPK_data(pk_file, self.boxsize)
 
         k_ny = self.npart * np.pi / (self.boxsize / 1000) # k_ny in Mpc^-1
+
+        return bins, pk, dk, k_ny
+
+    def load_combined_power_spectra(self, redshift, omegaM, omegaB):
+        """
+        Combines tabulated power spectra from DM and baryonic components
+
+        Args:
+            redshift (float): redshift of snapshot
+            omegaM (float): Omega Matter for this run
+            omegaB (float): Omega Baryon for this run
+
+        Returns:
+            bins (np.array(float)): power spectrum bins
+            pk (np.array(float)): 1D power spectrum Mpc^3/h
+            dk (np.array(float)): 1D dimensionless power spectrum
+        """
+        bins, pk_DM, dk_DM, k_ny = self.load_power_spectra(redshift, part_type='DM')
+        if self.baryon_type == 'DM':
+            return bins, pk_DM, dk_DM, k_ny
+        try:
+            _, pk_by, dk_by, _ = self.load_power_spectra(redshift, part_type='by')
+        except:
+            warnings.warn(f'No gas for redshift {redshift}...')
+            pk_by = dk_by = 0
+        try:
+            _, pk_st, dk_st, _ = self.load_power_spectra(redshift, part_type='st')
+        except:
+            warnings.warn(f'No stars for redshift {redshift}...')
+            pk_st = dk_st = 0
+
+        # weight by contribution to omegaM
+        pk = omegaB * pk_by + omegaB * pk_st + (omegaM - omegaB)/omegaM * pk_DM
+        dk = omegaB * dk_by + omegaB * dk_st + (omegaM - omegaB)/omegaM * dk_DM
 
         return bins, pk, dk, k_ny
 
@@ -224,6 +242,28 @@ class cosmoSim:
             dk_interp (function): 1D dimensionless power spectrum interpolation function
         """
         bins, pk, dk, k_ny = self.load_power_spectra(redshift, part_type)
+        pk_interp, lims = self.__interpolate(bins, pk)
+        dk_interp, lims = self.__interpolate(bins, dk)
+
+        return lims, pk_interp, dk_interp, k_ny
+
+    def interp_combined_power_spectra(self, redshift, omegaM, omegaB):
+        """
+        Loads tabulated power spectra from disk and interpolates
+        the result
+
+        Args:
+            redshift (float): redshift of snapshot
+            part_type (str): particle type to load
+                choices are ["DM", "by", "st", "all"]
+
+        Returns:
+            lims (np.array(float)): the bounds of validity for the interpolation function
+                                    packaged in the form [inf, sup]
+            pk_interp (function): 1D power spectrum interpolation function Mpc^3/h
+            dk_interp (function): 1D dimensionless power spectrum interpolation function
+        """
+        bins, pk, dk, k_ny = self.load_combined_power_spectra(redshift, omegaM, omegaB)
         pk_interp, lims = self.__interpolate(bins, pk)
         dk_interp, lims = self.__interpolate(bins, dk)
 
