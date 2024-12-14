@@ -57,7 +57,7 @@ class cosmoSim:
             if 'Vkick' in run_info.keys():
                 self.Vkick = run_info['Vkick']
             else:
-                warnings.warn('Vkick not explicitly set! Assuming 100 km/s...')
+                warnings.warn(f'Vkick not explicitly set in run {self.run_name}! Assuming 100 km/s...')
                 self.Vkick = 100.
         # TODO: move outside of try block once all runs are updated
         if self.baryon_type == 'HY':
@@ -98,16 +98,7 @@ class cosmoSim:
 
         return bins, pk, dk
 
-    def __redshift_to_index(self, redshift, tolerance=0.1):
-        """
-        Converts a given redshift to list index
-
-        Args:
-            redshift (float): redshift of snapshot
-
-        Returns:
-            index (int): index into redshift table
-        """
+    def __get_redshift_table_index(self, redshift, tolerance=0.1):
         max_tolerance = 0.5
         redshift_arr = np.array(self.redshifts)
         diffs = np.abs(redshift_arr - redshift)
@@ -118,11 +109,23 @@ class cosmoSim:
         diff = np.amin(diffs)
 
         if diff > tolerance:
-            warnings.warn(f"WARNING: Requested redshift {redshift} is not within tolerance {tolerance} of snapshot redshift {self.redshifts[idx]}!")
+            warnings.warn(f"WARNING: Requested redshift {redshift} is not within tolerance {tolerance} of snapshot redshift {self.redshifts[idx]} in run {self.run_name}!")
         if diff > max_tolerance:
-            raise Exception(f"ERROR: Requested redshift {redshift} is not within {max_tolerance} of any snapshot! Snapshot may not exist!")
+            raise Exception(f"ERROR: Requested redshift {redshift} is not within {max_tolerance} of any snapshot in run {self.run_name}! Snapshot may not exist!")
+        return idx
 
-        return self.file_indices[idx]
+    def __redshift_to_index(self, redshift, tolerance=0.1):
+        """
+        Converts a given redshift to list index
+
+        Args:
+            redshift (float): redshift of snapshot
+
+        Returns:
+            index (int): index of file with given redshift
+        """
+
+        return self.file_indices[self.__get_redshift_table_index(redshift, tolerance)]
 
     def __interpolate(self, domain, range):
         """
@@ -143,18 +146,19 @@ class cosmoSim:
 
         return interp1d(domain, range), np.array([inf, sup])
 
-    def get_nearest_redshift(self, r):
+    def get_nearest_redshift(self, r, tolerance=0.1):
         """
         Convenience function to return the nearest redshift to the requested value
 
         Args:
             r (float): requested redshift
+            tolerance (float): tolerance within to search
 
         Returns:
             nearest (float): the redshift of the snapshot with closest redshift to r
         """
 
-        return self.redshifts[self.__redshift_to_index(r)]
+        return self.redshifts[self.__get_redshift_table_index(r, tolerance)]
 
     def load_subhalo_info(self, redshift):
         """
@@ -230,7 +234,7 @@ class cosmoSim:
 
         return lims, pk_interp, dk_interp, k_ny
 
-    def load_combined_power_spectra(self, redshift):
+    def load_combined_power_spectra(self, redshift, debug=True):
         """
         Combines tabulated power spectra from DM and baryonic components
         weighting by contribution to Omega0
@@ -246,23 +250,26 @@ class cosmoSim:
         bins, pk_DM, dk_DM, k_ny = self.load_power_spectra(redshift, part_type='DM')
         if self.baryon_type == 'DM':
             return bins, pk_DM, dk_DM, k_ny
-        idx = self.__redshift_to_index(redshift)
-        omegaM = self.Omega0[idx]
+        ridx = self.__get_redshift_table_index(redshift)
+        #omegaM = self.Omega0[idx]
+        omegaM = 0.31001394664306675 # TODO: change back
         try:
             _, pk_by, dk_by, _ = self.load_power_spectra(redshift, part_type='by')
-            omegaB = self.OmegaB[idx]
+            omegaB = self.OmegaB[ridx]
         except:
-            warnings.warn(f'No gas for redshift {redshift}...')
+            warnings.warn(f'No gas for redshift {redshift} in run {self.run_name}')
             pk_by = dk_by = 0
             omegaB = 0
         try:
             _, pk_st, dk_st, _ = self.load_power_spectra(redshift, part_type='st')
-            omegaStar = self.OmegaStar[idx]
+            omegaStar = self.OmegaStar[ridx]
         except:
-            warnings.warn(f'No stars for redshift {redshift}...')
+            warnings.warn(f'No stars for redshift {redshift} in run {self.run_name}')
             pk_st = dk_st = 0
             omegaStar = 0
-
+        if debug:
+            pk_st = dk_st = 0
+            omegaStar = 0
         # weight by contribution to omegaM
         pk = omegaB * pk_by + omegaStar * pk_st + (omegaM - (omegaB + omegaStar))/omegaM * pk_DM
         dk = omegaB * dk_by + omegaStar * dk_st + (omegaM - (omegaB + omegaStar))/omegaM * dk_DM
