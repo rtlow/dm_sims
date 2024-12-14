@@ -53,6 +53,14 @@ class cosmoSim:
             else:
                 warnings.warn('Vkick not explicitly set! Assuming 100 km/s...')
                 self.Vkick = 100.
+        # TODO: move outside of try block once all runs are updated
+        if self.baryon_type == 'HY':
+            try:
+                self.Omega0 = run_info['Omega0']
+                self.OmegaB = run_info['OmegaB']
+                self.OmegaStar = run_info['OmegaStar']
+            except:
+                pass
         self.run_info = run_info
 
     def __calculate_fourier_conversion(self, Boxsize):
@@ -191,42 +199,6 @@ class cosmoSim:
 
         return bins, pk, dk, k_ny
 
-    def load_combined_power_spectra(self, redshift, omegaM, omegaB, debug=False):
-        """
-        Combines tabulated power spectra from DM and baryonic components
-
-        Args:
-            redshift (float): redshift of snapshot
-            omegaM (float): Omega Matter for this run
-            omegaB (float): Omega Baryon for this run
-
-        Returns:
-            bins (np.array(float)): power spectrum bins
-            pk (np.array(float)): 1D power spectrum Mpc^3/h
-            dk (np.array(float)): 1D dimensionless power spectrum
-        """
-        bins, pk_DM, dk_DM, k_ny = self.load_power_spectra(redshift, part_type='DM')
-        if self.baryon_type == 'DM':
-            return bins, pk_DM, dk_DM, k_ny
-        try:
-            _, pk_by, dk_by, _ = self.load_power_spectra(redshift, part_type='by')
-        except:
-            warnings.warn(f'No gas for redshift {redshift}...')
-            pk_by = dk_by = 0
-        try:
-            _, pk_st, dk_st, _ = self.load_power_spectra(redshift, part_type='st')
-        except:
-            warnings.warn(f'No stars for redshift {redshift}...')
-            pk_st = dk_st = 0
-
-        if debug: pk_st = dk_st = 0
-
-        # weight by contribution to omegaM
-        pk = omegaB * pk_by + omegaB * pk_st + (omegaM - omegaB)/omegaM * pk_DM
-        dk = omegaB * dk_by + omegaB * dk_st + (omegaM - omegaB)/omegaM * dk_DM
-
-        return bins, pk, dk, k_ny
-
     def interp_power_spectra(self, redshift, part_type='DM'):
         """
         Loads tabulated power spectra from disk and interpolates
@@ -249,15 +221,52 @@ class cosmoSim:
 
         return lims, pk_interp, dk_interp, k_ny
 
-    def interp_combined_power_spectra(self, redshift, omegaM, omegaB, debug=False):
+    def load_combined_power_spectra(self, redshift):
         """
-        Loads tabulated power spectra from disk and interpolates
-        the result
+        Combines tabulated power spectra from DM and baryonic components
+        weighting by contribution to Omega0
 
         Args:
             redshift (float): redshift of snapshot
-            part_type (str): particle type to load
-                choices are ["DM", "by", "st", "all"]
+
+        Returns:
+            bins (np.array(float)): power spectrum bins
+            pk (np.array(float)): 1D power spectrum Mpc^3/h
+            dk (np.array(float)): 1D dimensionless power spectrum
+        """
+        bins, pk_DM, dk_DM, k_ny = self.load_power_spectra(redshift, part_type='DM')
+        if self.baryon_type == 'DM':
+            return bins, pk_DM, dk_DM, k_ny
+        idx = self.__redshift_to_index(redshift)
+        omegaM = self.Omega0[idx]
+        try:
+            _, pk_by, dk_by, _ = self.load_power_spectra(redshift, part_type='by')
+            omegaB = self.OmegaB[idx]
+        except:
+            warnings.warn(f'No gas for redshift {redshift}...')
+            pk_by = dk_by = 0
+            omegaB = 0
+        try:
+            _, pk_st, dk_st, _ = self.load_power_spectra(redshift, part_type='st')
+            omegaStar = self.OmegaStar[idx]
+        except:
+            warnings.warn(f'No stars for redshift {redshift}...')
+            pk_st = dk_st = 0
+            omegaStar = 0
+
+        # weight by contribution to omegaM
+        pk = omegaB * pk_by + omegaStar * pk_st + (omegaM - (omegaB + omegaStar))/omegaM * pk_DM
+        dk = omegaB * dk_by + omegaStar * dk_st + (omegaM - (omegaB + omegaStar))/omegaM * dk_DM
+
+        return bins, pk, dk, k_ny
+
+    def interp_combined_power_spectra(self, redshift):
+        """
+        Combines tabulated power spectra from DM and baryonic components
+        and interpolates the result
+
+        Args:
+            redshift (float): redshift of snapshot
 
         Returns:
             lims (np.array(float)): the bounds of validity for the interpolation function
@@ -265,7 +274,7 @@ class cosmoSim:
             pk_interp (function): 1D power spectrum interpolation function Mpc^3/h
             dk_interp (function): 1D dimensionless power spectrum interpolation function
         """
-        bins, pk, dk, k_ny = self.load_combined_power_spectra(redshift, omegaM, omegaB, debug)
+        bins, pk, dk, k_ny = self.load_combined_power_spectra(redshift)
         pk_interp, lims = self.__interpolate(bins, pk)
         dk_interp, lims = self.__interpolate(bins, dk)
 
