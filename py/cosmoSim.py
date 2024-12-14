@@ -32,6 +32,12 @@ class cosmoSim:
 
         self.run_name = run_info["run name"]
         self.redshifts = run_info['redshifts']
+        try:
+            self.file_indices = run_info['file_indices']
+        except:
+            # bodge solution
+            self.file_indices = [0, 1, 2, 3, 4, 5, 6, 7]
+
         self.boxsize = run_info['BoxSize']
         self.npart = run_info['NPart']
 
@@ -105,6 +111,9 @@ class cosmoSim:
         max_tolerance = 0.5
         redshift_arr = np.array(self.redshifts)
         diffs = np.abs(redshift_arr - redshift)
+
+        # this indexes into the redshift array
+        # self.file_indices[idx] gives the actual file number
         idx = diffs.argmin()
         diff = np.amin(diffs)
 
@@ -113,7 +122,7 @@ class cosmoSim:
         if diff > max_tolerance:
             raise Exception(f"ERROR: Requested redshift {redshift} is not within {max_tolerance} of any snapshot! Snapshot may not exist!")
 
-        return idx
+        return self.file_indices[idx]
 
     def __interpolate(self, domain, range):
         """
