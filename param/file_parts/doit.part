@@ -50,6 +50,7 @@ N_RESTART=$(($SLURM_JOB_NUM_NODES*$SLURM_NTASKS_PER_NODE))
 if [ -f "$FINAL_SNAP" ]; then
 	N_FINAL_SNAP_EXISTS=0
 	echo "Final snapshot for Job $JOBNAME was written. Bye!"
+  sbatch ~/run-gen-pk-dir.sh "${OUTDIR}/{__JOBSTRING__}/"
 else
   N_FINAL_SNAP_EXISTS=1
   echo "Still snapshots to go..."
