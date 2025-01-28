@@ -37,8 +37,8 @@ GO=0
 # Actual run starting code
 ~/remove_core.sh
 
-module load hdf5/1.10.5
-module load openmpi/4.0
+module load hdf5
+module load openmpi
 mpiexec ./Arepo $PARAM_PATH $RESTART > $LOG_PATH
 
 ~/remove_core.sh
