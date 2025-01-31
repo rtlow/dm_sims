@@ -32,11 +32,8 @@ class cosmoSim:
 
         self.run_name = run_info["run name"]
         self.redshifts = run_info['redshifts']
-        try:
-            self.file_indices = run_info['file_indices']
-        except:
-            # bodge solution
-            self.file_indices = [0, 1, 2, 3, 4, 5, 6, 7]
+
+        self.file_indices = run_info['file_indices']
 
         self.boxsize = run_info['BoxSize']
         self.npart = run_info['NPart']
@@ -52,21 +49,17 @@ class cosmoSim:
         if self.dm_type == '2cDM' or self.dm_type == 'SIDM':
             self.sigma0 = run_info['sigma0']
             self.powerLaws = run_info['powerLaws']
-            self.plot_label += f' {self.powerLaws}, $\sigma_0=$ {self.sigma0}'
+            self.plot_label += f' {self.powerLaws}, $\\sigma_0=$ {self.sigma0}'
         if self.dm_type == '2cDM':
             if 'Vkick' in run_info.keys():
                 self.Vkick = run_info['Vkick']
             else:
                 warnings.warn(f'Vkick not explicitly set in run {self.run_name}! Assuming 100 km/s...')
                 self.Vkick = 100.
-        # TODO: move outside of try block once all runs are updated
         if self.baryon_type == 'HY':
-            try:
-                self.Omega0 = run_info['Omega0']
-                self.OmegaB = run_info['OmegaB']
-                self.OmegaStar = run_info['OmegaStar']
-            except:
-                pass
+            self.Omega0 = run_info['Omega0']
+            self.OmegaB = run_info['OmegaB']
+            self.OmegaStar = run_info['OmegaStar']
         self.run_info = run_info
 
     def __calculate_fourier_conversion(self, Boxsize):
@@ -95,6 +88,17 @@ class cosmoSim:
         bins = genPK[:, 0] * k_conv
 
         pk = genPK[:, 1] * p_conv
+
+        return bins, pk, dk
+    
+    def __get_pyliansPK_data(self, fpath):
+
+        pyliansPK = np.loadtxt(fpath)
+
+        bins = pyliansPK[:, 0]
+        pk = pyliansPK[:, 1]
+
+        dk = pk * (2 * np.pi)**3 * (4 * np.pi) * bins**3
 
         return bins, pk, dk
 
@@ -186,7 +190,7 @@ class cosmoSim:
 
         return Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad
 
-    def load_power_spectra(self, redshift, part_type='DM'):
+    def load_power_spectra(self, redshift, part_type='DM', backend="pylians"):
         """
         Loads tabulated power spectra from disk for this run
 
@@ -194,6 +198,8 @@ class cosmoSim:
             redshift (float): redshift of snapshot
             part_type (str): particle type to load
                 choices are ["DM", "by", "st"]
+            backend (str): program used to compute power spectrum
+                choices are ["pylians", "gen-pk"]
 
         Returns:
             bins (np.array(float)): power spectrum bins
@@ -201,18 +207,36 @@ class cosmoSim:
             dk (np.array(float)): 1D dimensionless power spectrum
         """
 
-        idx = self.__redshift_to_index(redshift)
-        pk_file = os.path.join(
-            self.__base_path,
-            self.run_name,
-            f'PK-{part_type}-snap_{idx:03}.hdf5')
-        bins, pk, dk = self.__get_genPK_data(pk_file, self.boxsize)
+        if backend == 'pylians':
+            match part_type:
+                case "DM":
+                    part_type_string = "CDM"
+                case "by":
+                    part_type_string = "GAS"
+                case "st":
+                    part_type_string = "Stars"
+                case "All":
+                    part_type_string = "GAS+CDM+Stars"
+            z = self.get_nearest_redshift(redshift)
+            pk_file = os.path.join(
+                self.__base_path,
+                self.run_name,
+                f'Pk_{part_type_string}_z={z:.4f}.dat')
+            bins, pk, dk = self.__get_pyliansPK_data(pk_file)
+
+        elif backend == 'gen-pk':
+            idx = self.__redshift_to_index(redshift)
+            pk_file = os.path.join(
+                self.__base_path,
+                self.run_name,
+                f'PK-{part_type}-snap_{idx:03}.hdf5')
+            bins, pk, dk = self.__get_genPK_data(pk_file, self.boxsize)
 
         k_ny = self.npart * np.pi / (self.boxsize / 1000) # k_ny in Mpc^-1
 
         return bins, pk, dk, k_ny
 
-    def interp_power_spectra(self, redshift, part_type='DM'):
+    def interp_power_spectra(self, redshift, part_type='DM', backend="pylians"):
         """
         Loads tabulated power spectra from disk and interpolates
         the result
@@ -221,6 +245,8 @@ class cosmoSim:
             redshift (float): redshift of snapshot
             part_type (str): particle type to load
                 choices are ["DM", "by", "st", "all"]
+            backend (str): program used to compute power spectrum
+                choices are ["pylians", "gen-pk"]
 
         Returns:
             lims (np.array(float)): the bounds of validity for the interpolation function
@@ -228,55 +254,57 @@ class cosmoSim:
             pk_interp (function): 1D power spectrum interpolation function Mpc^3/h
             dk_interp (function): 1D dimensionless power spectrum interpolation function
         """
-        bins, pk, dk, k_ny = self.load_power_spectra(redshift, part_type)
+        bins, pk, dk, k_ny = self.load_power_spectra(redshift, part_type, backend=backend)
         pk_interp, lims = self.__interpolate(bins, pk)
         dk_interp, lims = self.__interpolate(bins, dk)
 
         return lims, pk_interp, dk_interp, k_ny
 
-    def load_combined_power_spectra(self, redshift, debug=True):
+    def load_combined_power_spectra(self, redshift, backend="pylians"):
         """
         Combines tabulated power spectra from DM and baryonic components
         weighting by contribution to Omega0
 
         Args:
             redshift (float): redshift of snapshot
+            backend (str): program used to compute power spectrum
+                choices are ["pylians", "gen-pk"]
 
         Returns:
             bins (np.array(float)): power spectrum bins
             pk (np.array(float)): 1D power spectrum Mpc^3/h
             dk (np.array(float)): 1D dimensionless power spectrum
         """
-        bins, pk_DM, dk_DM, k_ny = self.load_power_spectra(redshift, part_type='DM')
-        if self.baryon_type == 'DM':
-            return bins, pk_DM, dk_DM, k_ny
-        ridx = self.__get_redshift_table_index(redshift)
-        #omegaM = self.Omega0[idx]
-        omegaM = 0.31001394664306675 # TODO: change back
-        try:
-            _, pk_by, dk_by, _ = self.load_power_spectra(redshift, part_type='by')
-            omegaB = self.OmegaB[ridx]
-        except:
-            warnings.warn(f'No gas for redshift {redshift} in run {self.run_name}')
-            pk_by = dk_by = 0
-            omegaB = 0
-        try:
-            _, pk_st, dk_st, _ = self.load_power_spectra(redshift, part_type='st')
-            omegaStar = self.OmegaStar[ridx]
-        except:
-            warnings.warn(f'No stars for redshift {redshift} in run {self.run_name}')
-            pk_st = dk_st = 0
-            omegaStar = 0
-        if debug:
-            pk_st = dk_st = 0
-            omegaStar = 0
-        # weight by contribution to omegaM
-        pk = omegaB * pk_by + omegaStar * pk_st + (omegaM - (omegaB + omegaStar))/omegaM * pk_DM
-        dk = omegaB * dk_by + omegaStar * dk_st + (omegaM - (omegaB + omegaStar))/omegaM * dk_DM
+        if backend == "pylians":
+            bins, pk_DM, dk_DM, k_ny = self.load_power_spectra(redshift, part_type='All', backend=backend)
+
+        elif backend == "gen-pk":
+            bins, pk_DM, dk_DM, k_ny = self.load_power_spectra(redshift, part_type='DM', backend=backend)
+            if self.baryon_type == 'DM':
+                return bins, pk_DM, dk_DM, k_ny
+            ridx = self.__get_redshift_table_index(redshift)
+            omegaM = self.Omega0[ridx]
+            try:
+                _, pk_by, dk_by, _ = self.load_power_spectra(redshift, part_type='by', backend=backend)
+                omegaB = self.OmegaB[ridx]
+            except:
+                warnings.warn(f'No gas for redshift {redshift} in run {self.run_name}')
+                pk_by = dk_by = 0
+                omegaB = 0
+            try:
+                _, pk_st, dk_st, _ = self.load_power_spectra(redshift, part_type='st', backend=backend)
+                omegaStar = self.OmegaStar[ridx]
+            except:
+                warnings.warn(f'No stars for redshift {redshift} in run {self.run_name}')
+                pk_st = dk_st = 0
+                omegaStar = 0
+            # weight by contribution to omegaM
+            pk = omegaB * pk_by + omegaStar * pk_st + (omegaM - (omegaB + omegaStar))/omegaM * pk_DM
+            dk = omegaB * dk_by + omegaStar * dk_st + (omegaM - (omegaB + omegaStar))/omegaM * dk_DM
 
         return bins, pk, dk, k_ny
 
-    def interp_combined_power_spectra(self, redshift):
+    def interp_combined_power_spectra(self, redshift, backend="pylians"):
         """
         Combines tabulated power spectra from DM and baryonic components
         and interpolates the result
@@ -290,7 +318,7 @@ class cosmoSim:
             pk_interp (function): 1D power spectrum interpolation function Mpc^3/h
             dk_interp (function): 1D dimensionless power spectrum interpolation function
         """
-        bins, pk, dk, k_ny = self.load_combined_power_spectra(redshift)
+        bins, pk, dk, k_ny = self.load_combined_power_spectra(redshift, backend=backend)
         pk_interp, lims = self.__interpolate(bins, pk)
         dk_interp, lims = self.__interpolate(bins, dk)
 

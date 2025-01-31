@@ -17,14 +17,14 @@ RESTART={__RESTART__}
 # Point to output directory
 OUTDIR="/home/r408l055/scratch/output"
 # Point to final snapshot
-FINAL_SNAP="${OUTDIR}/{__JOBSTRING__}/snap_007.hdf5"
+FINAL_SNAP="${OUTDIR}/{__JOBSTRING__}/snap_127.hdf5"
 
 
 # Modification is rarely needed
 RESTART_DIR="${OUTDIR}/{__JOBSTRING__}/restartfiles/"
 JOBNAME=$SLURM_JOB_NAME
 PARAM='{__PARAM_FILE__}'
-PARAM_PATH="../RUNS/boxes/${PARAM}"
+PARAM_PATH="../RUNS/710/${PARAM}"
 LOG_PATH=/home/r408l055/scratch/logs/LOG_${JOBNAME}_$(date +"%Y_%m_%d_%H_%M_%S")
 
 # Flags for iteration go/no-go
