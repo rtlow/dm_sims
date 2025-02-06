@@ -208,20 +208,25 @@ class cosmoSim:
         """
 
         if backend == 'pylians':
-            match part_type:
-                case "DM":
-                    part_type_string = "CDM"
-                case "by":
-                    part_type_string = "GAS"
-                case "st":
-                    part_type_string = "Stars"
-                case "All":
+            if part_type == "DM":
+                part_type_string = "CDM"
+            elif part_type == "by":
+                part_type_string = "GAS"
+            elif part_type == "st":
+                part_type_string = "Stars"
+            elif part_type == "All":
+                if self.baryon_type == "HY":
                     part_type_string = "GAS+CDM+Stars"
+                else:
+                    part_type_string = "CDM"
+            else:
+                part_type_string = ""
+                raise Exception("No Particle Types Specified")
             z = self.get_nearest_redshift(redshift)
             pk_file = os.path.join(
                 self.__base_path,
                 self.run_name,
-                f'Pk_{part_type_string}_z={z:.4f}.dat')
+                f'Pk_{part_type_string}_z={z:.3f}.dat')
             bins, pk, dk = self.__get_pyliansPK_data(pk_file)
 
         elif backend == 'gen-pk':
@@ -276,7 +281,7 @@ class cosmoSim:
             dk (np.array(float)): 1D dimensionless power spectrum
         """
         if backend == "pylians":
-            bins, pk_DM, dk_DM, k_ny = self.load_power_spectra(redshift, part_type='All', backend=backend)
+            bins, pk, dk, k_ny = self.load_power_spectra(redshift, part_type='All', backend=backend)
 
         elif backend == "gen-pk":
             bins, pk_DM, dk_DM, k_ny = self.load_power_spectra(redshift, part_type='DM', backend=backend)
