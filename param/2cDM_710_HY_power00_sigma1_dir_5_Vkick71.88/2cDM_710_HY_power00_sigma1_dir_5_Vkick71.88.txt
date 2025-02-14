@@ -6,8 +6,8 @@ ICFormat                                          3
 SnapFormat                                        3
 TimeLimitCPU                                      21600 %6hour
 CpuTimeBetRestartFile                             14400 %4hour
-ResubmitOn                                        0
-ResubmitCommand                                   my-scriptfile
+ResubmitOn                                        1
+ResubmitCommand                                   /home/r408l055/projects/SIDM/code/doit-restart.sh
 MaxMemSize                                        8000
 TimeBegin                                         0.0078125
 TimeMax                                           1
