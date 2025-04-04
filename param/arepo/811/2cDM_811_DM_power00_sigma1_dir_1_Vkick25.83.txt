@@ -1,0 +1,107 @@
+InitCondFile                                      ../RUNS/811/ics_811
+OutputDir                                         /home/r408l055/scratch/output/2cDM_811_DM_power00_sigma1_dir_1_Vkick25.83
+SnapshotFileBase                                  snap
+OutputListFilename                                ../TNGfiles/ExpansionList_128
+ICFormat                                          3
+SnapFormat                                        3
+TimeLimitCPU                                      21600 %6hour
+CpuTimeBetRestartFile                             14400 %4hour
+ResubmitOn                                        1
+ResubmitCommand                                   /home/r408l055/projects/SIDM/code/doit-restart.sh
+MaxMemSize                                        8000
+TimeBegin                                         0.0078125
+TimeMax                                           1
+ComovingIntegrationOn                             1
+PeriodicBoundariesOn                              1
+
+CoolingOn                                         0
+StarformationOn                                   0
+
+Omega0                                            0.301712
+OmegaLambda                                       0.698288
+OmegaBaryon                                       0
+HubbleParam                                       0.6909
+BoxSize                                           100000
+OutputListOn                                      1
+TimeBetSnapshot                                   0
+TimeOfFirstSnapshot                               0
+TimeBetStatistics                                 0.01
+NumFilesPerSnapshot                               1
+NumFilesWrittenInParallel                         16
+TypeOfTimestepCriterion                           0
+ErrTolIntAccuracy                                 0.012
+CourantFac                                        0.3
+MaxSizeTimestep                                   0.005
+MinSizeTimestep                                   0
+
+
+InitGasTemp                                       244.8095
+MinGasTemp                                        5.0
+MinimumDensityOnStartUp                           1e-20
+LimitUBelowThisDensity                            0
+LimitUBelowCertainDensityToThisValue              0
+MinEgySpec                                        0
+
+TypeOfOpeningCriterion                            1
+ErrTolTheta                                       0.7
+ErrTolForceAcc                                    0.0025
+MultipleDomains                                   64 %8
+TopNodeFactor                                     5
+
+DesNumNgb                                         64
+MaxNumNgbDeviation                                4
+
+UnitLength_in_cm                                  3.08568e+21
+UnitMass_in_g                                     1.989e+43
+UnitVelocity_in_cm_per_s                          100000
+
+GravityConstantInternal                           0
+GasSoftFactor                                     1.5
+CellShapingSpeed                                  0.5
+ErrTolThetaSubfind                                0.7
+DesLinkNgb                                        20
+
+ActivePartFracForNewDomainDecomp                  .005
+
+% Softening Lengths
+SofteningComovingType0                            1.22
+SofteningComovingType1                            1.22
+SofteningComovingType2                            3.0
+SofteningComovingType3                            1.0
+SofteningComovingType4                            1.22
+SofteningComovingType5                            2.5
+
+SofteningMaxPhysType0                             0.61
+SofteningMaxPhysType1                             0.61
+SofteningMaxPhysType2                             3.0
+SofteningMaxPhysType3                             1.0
+SofteningMaxPhysType4                             1.22
+SofteningMaxPhysType5                             2.5
+
+SofteningTypeOfPartType0                          0
+SofteningTypeOfPartType1                          1
+SofteningTypeOfPartType2                          1
+SofteningTypeOfPartType3                          1
+SofteningTypeOfPartType4                          1
+SofteningTypeOfPartType5                          2
+
+%#CellShapingFactor                                 1.0 %#Placeholder
+
+MinimumComovingHydroSoftening   0.125
+
+FlushCpuTimeDiff       120
+AdaptiveHydroSofteningSpacing   1.2
+
+%#CellShapingSpeed       0.5
+CellMaxAngleFactor		2.25
+ReferenceGasPartMass		0
+TargetGasMassFactor		1.0
+RefinementCriterion		1
+DerefinementCriterion		1
+
+%#CrossSectionPerMass_in_cgs      1.0
+% SIDM Parameters
+DtimeFac                                          0.0025
+DtimeFacLim                                       0.025
+SIDMDesNumNgb                                     32
+SIDMMaxNumNgbDeviation                            5

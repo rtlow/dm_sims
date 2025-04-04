@@ -1,0 +1,3 @@
+SIDM=2                                #activate and set types
+SIDM_STATES=1                         #number of DM states (for inelastic models)
+SIDM_REACTIONS=1                      #number of scatter reactions (for inelasitc models)

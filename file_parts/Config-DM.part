@@ -1,0 +1,1 @@
+FOF_SECONDARY_LINK_TYPES=4   # 2^type for the types linked to nearest primaries
