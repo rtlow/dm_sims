@@ -24,7 +24,7 @@ FINAL_SNAP="${OUTDIR}/2cDM_811_HY_power00_sigma1_dir_1_Vkick25.83/snap_127.hdf5"
 RESTART_DIR="${OUTDIR}/2cDM_811_HY_power00_sigma1_dir_1_Vkick25.83/restartfiles/"
 JOBNAME=$SLURM_JOB_NAME
 PARAM='2cDM_811_HY_power00_sigma1_dir_1_Vkick25.83.txt'
-PARAM_PATH="../RUNS/710/${PARAM}"
+PARAM_PATH="../RUNS/811/${PARAM}"
 LOG_PATH=/home/r408l055/scratch/logs/LOG_${JOBNAME}_$(date +"%Y_%m_%d_%H_%M_%S")
 
 # Flags for iteration go/no-go
