@@ -329,12 +329,14 @@ class cosmoSim:
 
         return lims, pk_interp, dk_interp, k_ny
 
-    def load_mass_profile(self, redshift):
+    def load_mass_profile(self, redshift, partType='all'):
         """
         Loads tabulated halo mass function from disk for this run
 
         Args:
             redshift (float): redshift of snapshot
+            partType (str): Particle type to use for mass function
+                choices are ["all", "stars"]
 
         Returns:
             mbins (np.array(float)): logarithmic mass bins in M_sun
@@ -343,11 +345,18 @@ class cosmoSim:
 
         idx = self.__redshift_to_index(redshift)
 
-        mbins, m = np.loadtxt(
-            os.path.join(self.__base_path,
-                         self.run_name,
-                         f'mass_profile_{idx}.txt')
-            )
+        if partType == 'all':
+            mbins, m = np.loadtxt(
+                os.path.join(self.__base_path,
+                            self.run_name,
+                            f'mass_profile_{idx}.txt')
+                )
+        elif partType == 'stars':
+            mbins, m = np.loadtxt(
+                os.path.join(self.__base_path,
+                            self.run_name,
+                            f'stellar_mass_profile_{idx}.txt')
+                )
 
         return mbins, m
 
@@ -411,7 +420,7 @@ class cosmoSim:
 
         return lims, v_interp
 
-    def load_mass_density(self, redshift, subhalo_idx):
+    def load_mass_density(self, redshift, subhalo_idx, partType='all'):
         """
         Loads tabulated halo mass density profile from disk
 
@@ -419,7 +428,8 @@ class cosmoSim:
             redshift (float): redshift of snapshot
             subhalo_idx (int): index of subhalo with 0 being largest,
                                1 second largest, etc.
-
+            partType (str):
+                choices are ["all", "gas", "by", "DM", "st", "bh"]
             Returns:
                 rbins (np.array(float)): radius bins densities were calculated within
                 densities (np.array(float)): Mass density within each bin in 10e10 M_sun/kpc^3
@@ -427,10 +437,24 @@ class cosmoSim:
 
         idx = self.__redshift_to_index(redshift)
 
-        rbins, densities = np.loadtxt(
+        X = np.loadtxt(
             os.path.join(self.__base_path,
                          self.run_name,
                          f'subhalo_densities_{idx}',
                          f'subhalo_{subhalo_idx}.txt')
             )
+        rbins = X[0]
+        if partType == 'all':
+            densities = X[1]
+        elif partType == 'gas':
+            densities = X[2]
+        elif partType == 'DM':
+            densities = X[3]
+        elif partType == 'st':
+            densities = X[4]
+        elif partType == 'bh':
+            densities = X[5]
+        elif partType == 'by':
+            densities = X[2] + X[4]
+
         return rbins, densities
