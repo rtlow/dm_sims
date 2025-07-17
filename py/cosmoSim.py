@@ -23,10 +23,11 @@ class cosmoSim:
         softening_length (float): Force resolution in kpc
         plot_label (str): Legend label to use on plots
     """
-    __base_path = "../../data_prods/"
 
-    def __init__(self, run_name):
-
+    def __init__(self, run_name, base_path="../../data_prods/"):
+        
+        self.__base_path = os.path.abspath(base_path)
+        
         with open(os.path.join(self.__base_path, run_name, 'run_info.json')) as f:
             run_info = json.load(f)
 
@@ -467,10 +468,12 @@ class cosmoSim:
             redshift (float):
                 redshift of snapshot
         Returns:
-            fpath (str):
-                absolute path to the folder containing fake_spectra savefiles
+            base (str):
+                absolute path to the folder containing fake_spectra savefile folders
+            num (int):
+                index for this requested redshift
         """
         
-        idx = self.__redshift_to_index(redshift)
-        path = os.path.join(self.__base_path, self.run_name, f"SPECTRA_{idx:03}")
-        return str(os.path.abspath(path))
+        num = self.__redshift_to_index(redshift)
+        base = str(os.path.abspath(os.path.join(self.__base_path, self.run_name)))
+        return num, base
