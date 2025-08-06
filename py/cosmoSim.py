@@ -24,7 +24,7 @@ class cosmoSim:
         plot_label (str): Legend label to use on plots
     """
 
-    def __init__(self, run_name, base_path="../../data_prods/"):
+    def __init__(self, run_name, base_path="../../data_prods/", explicit_warn=False):
         
         self.__base_path = os.path.abspath(base_path)
         
@@ -55,7 +55,8 @@ class cosmoSim:
             if 'Vkick' in run_info.keys():
                 self.Vkick = run_info['Vkick']
             else:
-                warnings.warn(f'Vkick not explicitly set in run {self.run_name}! Assuming 100 km/s...')
+                if explicit_warn:
+                    warnings.warn(f'Vkick not explicitly set in run {self.run_name}! Assuming 100 km/s...')
                 self.Vkick = 100.
         if self.baryon_type == 'HY':
             self.Omega0 = run_info['Omega0']
