@@ -338,7 +338,7 @@ class cosmoSim:
         Args:
             redshift (float): redshift of snapshot
             partType (str): Particle type to use for mass function
-                choices are ["all", "stars"]
+                choices are ["all", "DM", "gas", "stars", "by"]
 
         Returns:
             mbins (np.array(float)): logarithmic mass bins in M_sun
@@ -353,16 +353,35 @@ class cosmoSim:
                             self.run_name,
                             f'mass_profile_{idx}.txt')
                 )
+        elif partType == 'DM':
+            mbins, m = np.loadtxt(
+                os.path.join(self.__base_path,
+                            self.run_name,
+                            f'part_type_{1}_mass_profile_{idx}.txt')
+                )
+        elif partType == 'gas':
+            mbins, m = np.loadtxt(
+                os.path.join(self.__base_path,
+                            self.run_name,
+                            f'part_type_{0}_mass_profile_{idx}.txt')
+                )
         elif partType == 'stars':
             mbins, m = np.loadtxt(
                 os.path.join(self.__base_path,
                             self.run_name,
-                            f'stellar_mass_profile_{idx}.txt')
+                            f'part_type_{4}_mass_profile_{idx}.txt')
                 )
+        elif partType == 'by':
+            mbins, m = np.loadtxt(
+                os.path.join(self.__base_path,
+                            self.run_name,
+                            f'by_mass_profile_{idx}.txt')
+                )
+
 
         return mbins, m
 
-    def interp_mass_profile(self, redshift):
+    def interp_mass_profile(self, redshift, partType='all'):
         """
         Loads tabulated halo mass function from disk
         and interpolates the result
@@ -375,7 +394,7 @@ class cosmoSim:
                                     packaged in the form [inf, sup]
             m_interp (function): mass function interpolation function
         """
-        mbins, m = self.load_mass_profile(redshift)
+        mbins, m = self.load_mass_profile(redshift, partType=partType)
 
         m_interp, lims = self.__interpolate(mbins, m)
 
