@@ -120,7 +120,7 @@ class cosmoSim:
             raise Exception(f"ERROR: Requested redshift {redshift} is not within {max_tolerance} of any snapshot in run {self.run_name}! Snapshot may not exist!")
         return idx
 
-    def __redshift_to_index(self, redshift, tolerance=0.1):
+    def redshift_to_index(self, redshift, tolerance=0.1):
         """
         Converts a given redshift to list index
 
@@ -181,7 +181,7 @@ class cosmoSim:
             massInHalfRad (np.array(float)): Mass contained within half mass radius
             massInRad (np.array(float)): Mass contained within 2 * half mass radius
         """
-        idx = self.__redshift_to_index(redshift)
+        idx = self.redshift_to_index(redshift)
 
         Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad = np.loadtxt(
             os.path.join(
@@ -232,7 +232,7 @@ class cosmoSim:
             bins, pk, dk = self.__get_pyliansPK_data(pk_file)
 
         elif backend == 'gen-pk':
-            idx = self.__redshift_to_index(redshift)
+            idx = self.redshift_to_index(redshift)
             pk_file = os.path.join(
                 self.__base_path,
                 self.run_name,
@@ -345,7 +345,7 @@ class cosmoSim:
             m (np.array(float)): cumulative halo count in bins
         """
 
-        idx = self.__redshift_to_index(redshift)
+        idx = self.redshift_to_index(redshift)
 
         if partType == 'all':
             mbins, m = np.loadtxt(
@@ -412,7 +412,7 @@ class cosmoSim:
             v (np.array(float)): cumulative halo count in bins
         """
 
-        idx = self.__redshift_to_index(redshift)
+        idx = self.redshift_to_index(redshift)
 
         vbins, v = np.loadtxt(
             os.path.join(self.__base_path,
@@ -421,7 +421,7 @@ class cosmoSim:
             )
 
         return vbins, v
-
+        
     def interp_vels_profile(self, redshift):
         """
         Loads tabulated circular velocity function from disk
@@ -440,6 +440,49 @@ class cosmoSim:
         v_interp, lims = self.__interpolate(vbins, v)
 
         return lims, v_interp
+    
+    # TODO: Unify these load/interp functions into just one with options
+
+    def load_SFR_profile(self, redshift):
+        """
+        Loads tabulated SFR function from disk for this run
+
+        Args:
+            redshift (float): redshift of snapshot
+
+        Returns:
+            sfr_bins (np.array(float)): logarithmic SFR bins in M_sun/yr
+            s (np.array(float)): cumulative halo count in bins
+        """
+
+        idx = self.redshift_to_index(redshift)
+
+        sfr_bins, s = np.loadtxt(
+            os.path.join(self.__base_path,
+                         self.run_name,
+                         f'SFR_profile_{idx}.txt')
+            )
+
+        return sfr_bins, s
+
+    def interp_SFR_profile(self, redshift):
+        """
+        Loads tabulated SFR function from disk
+        and interpolates the result
+
+        Args:
+            redshift (float): redshift of snapshot
+
+        Returns:
+            lims (np.array(float)): the bounds of validity for the interpolation function
+                                    packaged in the form [inf, sup]
+            s_interp (function): SFR function interpolation function
+        """
+        sfr_bins, s = self.load_SFR_profile(redshift)
+
+        s_interp, lims = self.__interpolate(sfr_bins, s)
+
+        return lims, s_interp
 
     def load_mass_density(self, redshift, subhalo_idx, partType='all'):
         """
@@ -456,7 +499,7 @@ class cosmoSim:
                 densities (np.array(float)): Mass density within each bin in 10e10 M_sun/kpc^3
         """
 
-        idx = self.__redshift_to_index(redshift)
+        idx = self.redshift_to_index(redshift)
 
         X = np.loadtxt(
             os.path.join(self.__base_path,
@@ -494,6 +537,6 @@ class cosmoSim:
                 index for this requested redshift
         """
         
-        num = self.__redshift_to_index(redshift)
+        num = self.redshift_to_index(redshift)
         base = str(os.path.abspath(os.path.join(self.__base_path, self.run_name)))
         return num, base
