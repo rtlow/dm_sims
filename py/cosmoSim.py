@@ -191,6 +191,31 @@ class cosmoSim:
             )
 
         return Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad
+    
+    def load_profile_info(self, redshift):
+        """
+        Loads tabulated subhalo information
+
+        Args:
+            redshift (float): redshift of snapshot
+
+        Returns:
+            cutoffs (np.array(float)): Array containing lower bounds for subhalo profiles
+                                       with specified number of particles, i.e. stats above
+                                       a certain cutoff.
+                                       Format:
+                                       [ mass_cutoff, vmax_cutoff, ...mass_cutoff_by_type...]
+        """
+        idx = self.redshift_to_index(redshift)
+
+        cutoffs = np.loadtxt(
+            os.path.join(
+            self.__base_path,
+            self.run_name,
+            f"profile_cutoffs_{idx}.txt")
+            )
+
+        return cutoffs
 
     def load_power_spectra(self, redshift, part_type='DM', backend="pylians"):
         """
