@@ -216,6 +216,31 @@ class cosmoSim:
             )
 
         return cutoffs
+    
+    def load_group_profile_info(self, redshift):
+        """
+        Loads tabulated halo information
+
+        Args:
+            redshift (float): redshift of snapshot
+
+        Returns:
+            cutoffs (np.array(float)): Array containing lower bounds for halo profiles
+                                       with specified number of particles, i.e. stats above
+                                       a certain cutoff.
+                                       Format:
+                                       [ mass_cutoff, ...mass_cutoff_by_type...]
+        """
+        idx = self.redshift_to_index(redshift)
+
+        cutoffs = np.loadtxt(
+            os.path.join(
+            self.__base_path,
+            self.run_name,
+            f"group_profile_cutoffs_{idx}.txt")
+            )
+
+        return cutoffs
 
     def load_power_spectra(self, redshift, part_type='DM', backend="pylians"):
         """
@@ -356,7 +381,7 @@ class cosmoSim:
 
         return lims, pk_interp, dk_interp, k_ny
 
-    def load_mass_profile(self, redshift, partType='all'):
+    def load_mass_profile(self, redshift, partType='all', groups=False):
         """
         Loads tabulated halo mass function from disk for this run
 
@@ -402,11 +427,44 @@ class cosmoSim:
                             self.run_name,
                             f'by_mass_profile_{idx}.txt')
                 )
+        
+        # TODO: hacky solution for now, really need to refactor
+        if groups:
+            if partType == 'all':
+                mbins, m = np.loadtxt(
+                    os.path.join(self.__base_path,
+                                self.run_name,
+                                f'group_mass_profile_{idx}.txt')
+                    )
+            elif partType == 'DM':
+                mbins, m = np.loadtxt(
+                    os.path.join(self.__base_path,
+                                self.run_name,
+                                f'group_part_type_{1}_mass_profile_{idx}.txt')
+                    )
+            elif partType == 'gas':
+                mbins, m = np.loadtxt(
+                    os.path.join(self.__base_path,
+                                self.run_name,
+                                f'group_part_type_{0}_mass_profile_{idx}.txt')
+                    )
+            elif partType == 'stars':
+                mbins, m = np.loadtxt(
+                    os.path.join(self.__base_path,
+                                self.run_name,
+                                f'group_part_type_{4}_mass_profile_{idx}.txt')
+                    )
+            elif partType == 'by':
+                mbins, m = np.loadtxt(
+                    os.path.join(self.__base_path,
+                                self.run_name,
+                                f'group_by_mass_profile_{idx}.txt')
+                    )
 
 
         return mbins, m
 
-    def interp_mass_profile(self, redshift, partType='all'):
+    def interp_mass_profile(self, redshift, partType='all', groups=False):
         """
         Loads tabulated halo mass function from disk
         and interpolates the result
@@ -419,7 +477,7 @@ class cosmoSim:
                                     packaged in the form [inf, sup]
             m_interp (function): mass function interpolation function
         """
-        mbins, m = self.load_mass_profile(redshift, partType=partType)
+        mbins, m = self.load_mass_profile(redshift, partType=partType, groups=groups)
 
         m_interp, lims = self.__interpolate(mbins, m)
 
