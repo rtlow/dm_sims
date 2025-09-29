@@ -150,7 +150,7 @@ class cosmoSim:
         inf = np.amin(domain)
         sup = np.amax(domain)
 
-        return interp1d(domain, range), np.array([inf, sup])
+        return interp1d(domain, range, fill_value="extrapolate"), np.array([inf, sup])
 
     def get_nearest_redshift(self, r, tolerance=0.1):
         """
