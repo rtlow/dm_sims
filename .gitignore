@@ -1,6 +1,6 @@
 cross_sections/
 *.backup
-*DLA.hdf5
+*DLA*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
