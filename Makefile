@@ -120,24 +120,16 @@ endif
 
 
 ifeq ($(SYSTYPE),"KU")
-#CC = /kuhpc/software/install/openmpi/2.0/gcc/6.3/bin/mpicc
 CC = mpicc
 OPTIMIZE =  -std=c99 -O3 -g -Wall -fcommon # -hpic
-#MPICHLIB = -L/kuhpc/software/install/openmpi/2.0/gcc/6.3/lib
 MPICHLIB = 
 GMP_INCL = -I/usr/include
 GMP_LIBS = -L/usr/lib64
 GSL_INCL = -I/home/r408l055/include
 GSL_LIBS = -L/home/r408l055/lib -lgsl -lgslcblas
-FFTW_INCL = -I/kuhpc/software/7/install/fftw3/3.3.8/gcc/8.3/include
-FFTW_LIBS = -L/kuhpc/software/7/install/fftw3/3.3.8/gcc/8.3/lib
-#FFTW_INCL =  -I/kuhpc/software/7/install/fftw3/3.3.8/gcc/8.5/include
-#FFTW_LIBS = -I/kuhpc/software/7/install/fftw3/3.3.8/gcc/8.5/lib
-#HDF5INCL = -I/kuhpc/software/install/hdf5/1.10.1/include -DH5_USE_16_API
-#HDF5LIB  = -L/kuhpc/software/install/hdf5/1.10.1/lib -lhdf5 
-#HDF5INCL = -I/kuhpc/software/install/hdf5/gcc/6.3/1.10.1/include -DH5_USE_16_API
-#HDF5LIB  = -L/kuhpc/software/install/hdf5/gcc/6.3/1.10.1/lib -lhdf5  
-HDF5INCL = -I/kuhpc/sw/hdf5/1.14.5/gcc/11.4/include -DH5_USE_16_API
+FFTW_INCL = 
+FFTW_LIBS = 
+HDF5INCL = -DH5_USE_16_API
 HDF5LIB  = -L/kuhpc/sw/hdf5/1.14.5/gcc/11.4/lib -lhdf5
 endif
 
