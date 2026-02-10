@@ -180,17 +180,18 @@ class cosmoSim:
             halfMassRad (np.array(float)): Subhalo half mass radius
             massInHalfRad (np.array(float)): Mass contained within half mass radius
             massInRad (np.array(float)): Mass contained within 2 * half mass radius
+            subhaloLen (np.array(int)): Number of particles in this subhalo
         """
         idx = self.redshift_to_index(redshift)
 
-        Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad = np.loadtxt(
+        Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad, subhaloLen = np.loadtxt(
             os.path.join(
             self.__base_path,
             self.run_name,
             f'subhalo_stats_{idx}.txt')
             )
 
-        return Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad
+        return Vmax, Rmax, subhaloMass, halfMasRad, massInHalfRad, massInRad, subhaloLen
     
     def load_profile_info(self, redshift):
         """
