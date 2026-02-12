@@ -3,8 +3,8 @@
 #SBATCH --ntasks-per-node=32
 #SBATCH --mem-per-cpu={__MEMSIZE__}
 #SBATCH --time=6:00:00
-##SBATCH --mail-user=rtlow@ku.edu
-##SBATCH --mail-type=ALL
+#SBATCH --mail-user=rtlow@ku.edu
+#SBATCH --mail-type=ALL
 #SBATCH --job-name={__JOBSTRING__}
 #SBATCH --partition=sixhour
 #SBATCH --constraint "intel"
