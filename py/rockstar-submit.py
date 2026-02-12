@@ -13,7 +13,7 @@ INBASE = sys.argv[1]
 
 OUTBASE = f"{INBASE}/Rockstar" #where to output files
 
-rockstarComand ='/r408l055/home/rockstar/rockstar'
+rockstarComand ='/home/r408l055/rockstar/rockstar'
 
 rockstarConf = {
 'FILE_FORMAT': '"AREPO"',
