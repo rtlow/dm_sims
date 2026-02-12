@@ -29,7 +29,7 @@ parallelConf = {
 'NUM_BLOCKS': 1,                              # <number of files per snapshot>
 'NUM_SNAPS': 128,                               # <total number of snapshots>
 'STARTING_SNAP': 0,
-'FILENAME': '"snap_<snap>"',              #"my_sim.<snap>.<block>"
+'FILENAME': '"snap_<snap>.hdf5"',              #"my_sim.<snap>.<block>" need to include file extension
 'NUM_WRITERS': 16,                             #<number of CPUs>
 'FORK_READERS_FROM_WRITERS': 1,
 'FORK_PROCESSORS_PER_MACHINE': 16,             #<number of processors per node>
