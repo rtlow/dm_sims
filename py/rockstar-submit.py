@@ -19,7 +19,7 @@ rockstarConf = {
 'FILE_FORMAT': '"AREPO"',
 'AREPO_LENGTH_CONVERSION' :1e-3,  #convert from kpc to Mpc
 'AREPO_MASS_CONVERSION': 1e+10,
-'FORCE_RES': 100000 / 2**11 / 39,                 #Mpc/h set up for 811 right now
+'FORCE_RES': 100000 / 2**11 / 29,                 #Mpc/h set up for 811 right now
 'OUTBASE': OUTBASE,
 }
 
@@ -30,9 +30,9 @@ parallelConf = {
 'NUM_SNAPS': 128,                               # <total number of snapshots>
 'STARTING_SNAP': 0,
 'FILENAME': '"snap_<snap>.hdf5"',              #"my_sim.<snap>.<block>" need to include file extension
-'NUM_WRITERS': 16,                             #<number of CPUs>
+'NUM_WRITERS': 32,                             #<number of CPUs>
 'FORK_READERS_FROM_WRITERS': 1,
-'FORK_PROCESSORS_PER_MACHINE': 16,             #<number of processors per node>
+'FORK_PROCESSORS_PER_MACHINE': 32,             #<number of processors per node>
 }
 
 

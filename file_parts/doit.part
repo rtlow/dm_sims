@@ -9,6 +9,8 @@
 #SBATCH --partition=sixhour
 #SBATCH --constraint "intel"
 #SBATCH --constraint=ib
+#SBATCH -o /home/r408l055/scratch/logs/%x.%j.out
+#SBATCH -e /home/r408l055/scratch/logs/%x.%j.err
 
 # Which code directory
 i={__CODE_DIR__}
@@ -50,7 +52,8 @@ N_RESTART=$(($SLURM_JOB_NUM_NODES*$SLURM_NTASKS_PER_NODE))
 if [ -f "$FINAL_SNAP" ]; then
 	N_FINAL_SNAP_EXISTS=0
 	echo "Final snapshot for Job $JOBNAME was written. Bye!"
-  sbatch ~/run-gen-pk-dir.sh "${OUTDIR}/{__JOBSTRING__}/"
+  ~/run-gen-pk-submit.sh "${OUTDIR}/{__JOBSTRING__}/"
+  ~/run-rockstar-dir.sh "${OUTDIR}/{__JOBSTRING__}/"
 else
   N_FINAL_SNAP_EXISTS=1
   echo "Still snapshots to go..."
