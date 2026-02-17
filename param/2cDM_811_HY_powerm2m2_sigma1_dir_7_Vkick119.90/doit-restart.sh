@@ -3,12 +3,14 @@
 #SBATCH --ntasks-per-node=32
 #SBATCH --mem-per-cpu=8g
 #SBATCH --time=6:00:00
-##SBATCH --mail-user=rtlow@ku.edu
-##SBATCH --mail-type=ALL
+#SBATCH --mail-user=rtlow@ku.edu
+#SBATCH --mail-type=ALL
 #SBATCH --job-name=2cDM_811_HY_powerm2m2_sigma1_dir_7_Vkick119.90
 #SBATCH --partition=sixhour
 #SBATCH --constraint "intel"
 #SBATCH --constraint=ib
+#SBATCH -o /home/r408l055/scratch/logs/%x.%j.out
+#SBATCH -e /home/r408l055/scratch/logs/%x.%j.err
 
 # Which code directory
 i=7
@@ -50,7 +52,8 @@ N_RESTART=$(($SLURM_JOB_NUM_NODES*$SLURM_NTASKS_PER_NODE))
 if [ -f "$FINAL_SNAP" ]; then
 	N_FINAL_SNAP_EXISTS=0
 	echo "Final snapshot for Job $JOBNAME was written. Bye!"
-  sbatch ~/run-gen-pk-dir.sh "${OUTDIR}/2cDM_811_HY_powerm2m2_sigma1_dir_7_Vkick119.90/"
+  ~/run-gen-pk-submit.sh "${OUTDIR}/2cDM_811_HY_powerm2m2_sigma1_dir_7_Vkick119.90/"
+  ~/run-rockstar-dir.sh "${OUTDIR}/2cDM_811_HY_powerm2m2_sigma1_dir_7_Vkick119.90/"
 else
   N_FINAL_SNAP_EXISTS=1
   echo "Still snapshots to go..."
