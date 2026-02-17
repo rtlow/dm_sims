@@ -19,7 +19,7 @@ rockstarConf = {
 'FILE_FORMAT': '"AREPO"',
 'AREPO_LENGTH_CONVERSION' :1e-3,  #convert from kpc to Mpc
 'AREPO_MASS_CONVERSION': 1e+10,
-'FORCE_RES': 100000 / 2**11 / 29,                 #Mpc/h set up for 811 right now
+'FORCE_RES': 100 / 2**11 / 29,                 #Mpc/h set up for 811 right now
 'OUTBASE': OUTBASE,
 }
 
