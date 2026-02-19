@@ -14,7 +14,7 @@
 #SBATCH --array=0-7
 
 source ~/modules.sh
-module load openmp
+module load openmpi
 
 export OMP_NUM_THREADS=$SLURM_NTASKS_PER_NODE
 

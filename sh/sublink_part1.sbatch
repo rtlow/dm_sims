@@ -13,7 +13,7 @@
 #SBATCH -o /home/r408l055/scratch/logs/%x.%j.out
 
 source ~/modules.sh
-module load openmp
+module load openmpi
 
 ## OMP_NUM_THREADS controls the number of threads your application uses
 ## This variable cat be set by the following command:
@@ -31,6 +31,8 @@ if [ ! -d $WRITEDIR ]; then
 fi
 WRITEPATH=$WRITEDIR/desc
 
+SKIP_FILENAME=~/skip_snaps.txt
+
 SNAPNUM_FIRST=0
 SNAPNUM_LAST=127
 SNAPNUM_START=0
@@ -38,7 +40,7 @@ SNAPNUM_END=127
 
 # First pass
 PASS=first
-~/sublink/Descendants/find_descendants $BASEDIR ${WRITEPATH}_${PASS} $SNAPNUM_FIRST $SNAPNUM_LAST $SNAPNUM_START $SNAPNUM_END $TRACKING ${PASS}
+~/sublink/Descendants/find_descendants $BASEDIR ${WRITEPATH}_${PASS} $SNAPNUM_FIRST $SNAPNUM_LAST $SNAPNUM_START $SNAPNUM_END $TRACKING ${PASS} ${SKIP_FILENAME}
 
 #~ # Second pass
 #~ PASS=second

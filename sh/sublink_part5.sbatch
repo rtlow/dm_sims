@@ -13,7 +13,7 @@
 #SBATCH -o /home/r408l055/scratch/logs/%x.%j.out
 
 source ~/modules.sh
-module load openmp
+module load openmpi
 
 export OMP_NUM_THREADS=$SLURM_NTASKS_PER_NODE
 
