@@ -31,17 +31,17 @@ SNAPNUM_LAST=127
 
 # Create extended trees
 echo ""; echo "CREATING EXTENDED TREES..."
-python ./SubLink/Python/create_extended_trees.py $BASEDIR $TREEDIR $SNAPNUM_LAST
+python ~/sublink/Python/create_extended_trees.py $BASEDIR $TREEDIR $SNAPNUM_LAST
 
 # Concatenate minimal trees
 echo ""; echo "CONCATENATING MINIMAL TREES..."
-python ./SubLink/Python/concatenate_trees.py ${TREEDIR}/tree
+python ~/sublink/Python/concatenate_trees.py ${TREEDIR}/tree
 
 # Concatenate extended trees
 echo ""; echo "CONCATENATING EXTENDED TREES..."
-python ./SubLink/Python/concatenate_trees.py ${TREEDIR}/tree_extended
+python ~/sublink/Python/concatenate_trees.py ${TREEDIR}/tree_extended
 
 # Compute offsets
 echo ""; echo "COMPUTING OFFSETS..."
-python ./SubLink/Python/compute_offsets.py $BASEDIR $TREEDIR $SNAPNUM_FIRST $SNAPNUM_LAST
+python ~/sublink/Python/compute_offsets.py $BASEDIR $TREEDIR $SNAPNUM_FIRST $SNAPNUM_LAST
 

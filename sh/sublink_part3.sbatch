@@ -38,14 +38,14 @@ SNAPNUM_END=127
 
 #~ # First pass
 #~ PASS=first
-#~ ./SubLink/Descendants/find_descendants $BASEDIR ${WRITEPATH}_${PASS} $SNAPNUM_FIRST $SNAPNUM_LAST $SNAPNUM_START $SNAPNUM_END $TRACKING ${PASS} ${SKIP_FILENAME}
+#~ ~/sublink/Descendants/find_descendants $BASEDIR ${WRITEPATH}_${PASS} $SNAPNUM_FIRST $SNAPNUM_LAST $SNAPNUM_START $SNAPNUM_END $TRACKING ${PASS} ${SKIP_FILENAME}
 #~ 
 #~ # Second pass
 #~ PASS=second
-#~ ./SubLink/Descendants/find_descendants $BASEDIR ${WRITEPATH}_${PASS} $SNAPNUM_FIRST $SNAPNUM_LAST $SNAPNUM_START $SNAPNUM_END $TRACKING ${PASS} ${SKIP_FILENAME}
+#~ ~/sublink/Descendants/find_descendants $BASEDIR ${WRITEPATH}_${PASS} $SNAPNUM_FIRST $SNAPNUM_LAST $SNAPNUM_START $SNAPNUM_END $TRACKING ${PASS} ${SKIP_FILENAME}
 
 # Compare descendants
-./SubLink/Descendants/compare_descendants ${WRITEPATH} $SNAPNUM_FIRST $SNAPNUM_LAST
+~/sublink/Descendants/compare_descendants ${WRITEPATH} $SNAPNUM_FIRST $SNAPNUM_LAST
 
 # ---------------------------- BUILD TREES
 
@@ -53,6 +53,6 @@ TREEDIR=$1/sublink/$TRACKING
 INPUT_PATH=$TREEDIR/descendants/desc
 OUTPUT_PATH=$TREEDIR/tree
 
-./SubLink/SubhaloTrees/build_trees ${INPUT_PATH} ${OUTPUT_PATH} ${SNAPNUM_FIRST} ${SNAPNUM_LAST}
+~/sublink/SubhaloTrees/build_trees ${INPUT_PATH} ${OUTPUT_PATH} ${SNAPNUM_FIRST} ${SNAPNUM_LAST}
 
 sbatch sublink_part4.sbatch $1

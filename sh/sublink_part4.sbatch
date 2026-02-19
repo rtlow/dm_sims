@@ -35,6 +35,6 @@ SNAPNUM_LAST=127
 
 # Create extra columns
 echo ""; echo "CREATING EXTRA COLUMNS..."
-python ./SubLink/Python/create_columns.py $BASEDIR $TREEDIR $SNAPNUM_FIRST $SNAPNUM_LAST $NUM_JOBS ${SLURM_ARRAY_TASK_ID}
+python ~/sublink/Python/create_columns.py $BASEDIR $TREEDIR $SNAPNUM_FIRST $SNAPNUM_LAST $NUM_JOBS ${SLURM_ARRAY_TASK_ID}
 
 sbatch sublink_part5.sbatch $1
