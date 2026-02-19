@@ -53,7 +53,7 @@ if [ -f "$FINAL_SNAP" ]; then
 	N_FINAL_SNAP_EXISTS=0
 	echo "Final snapshot for Job $JOBNAME was written. Bye!"
   ~/run-gen-pk-submit.sh "${OUTDIR}/2cDM_811_HY_powerm2m2_sigma1_dir_7_Vkick119.90/"
-  ~/run-rockstar-dir.sh "${OUTDIR}/2cDM_811_HY_powerm2m2_sigma1_dir_7_Vkick119.90/"
+  sbatch ~/run-rockstar-dir.sh "${OUTDIR}/2cDM_811_HY_powerm2m2_sigma1_dir_7_Vkick119.90/"
 else
   N_FINAL_SNAP_EXISTS=1
   echo "Still snapshots to go..."
