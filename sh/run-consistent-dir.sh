@@ -16,7 +16,7 @@ source /home/r408l055/modules.sh
 
 INDIR=$1
 
-perl ~/rockstar/scripts/gen_merger_cfg.pl $INDIR/rockstar.cfg
+perl ~/rockstar-galaxies/scripts/gen_merger_cfg.pl $INDIR/rockstar.cfg
 
 cd ~/consistent-trees
 

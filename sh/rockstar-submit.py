@@ -13,7 +13,7 @@ INBASE = sys.argv[1]
 
 OUTBASE = f"{INBASE}/Rockstar" #where to output files
 
-rockstarComand ='/home/r408l055/rockstar/rockstar'
+rockstarComand ='/home/r408l055/rockstar-galaxies/rockstar-galaxies'
 
 rockstarConf = {
 'FILE_FORMAT': '"AREPO"',
@@ -30,9 +30,9 @@ parallelConf = {
 'NUM_SNAPS': 128,                               # <total number of snapshots>
 'STARTING_SNAP': 0,
 'FILENAME': '"snap_<snap>.hdf5"',              #"my_sim.<snap>.<block>" need to include file extension
-'NUM_WRITERS': 32,                             #<number of CPUs>
+'NUM_WRITERS': nProc,                             #<number of CPUs>
 'FORK_READERS_FROM_WRITERS': 1,
-'FORK_PROCESSORS_PER_MACHINE': 32,             #<number of processors per node>
+'FORK_PROCESSORS_PER_MACHINE': nProc,             #<number of processors per node>
 }
 
 
