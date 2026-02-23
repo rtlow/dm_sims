@@ -22,6 +22,6 @@ pip install mpi4py --user
 
 INDIR=$1
 
-mpiexec -np $SLURM_NTASKS python ~/rockstar-galaxies/rockstar-submit-L3N256.py $INDIR
+mpiexec -np $SLURM_NTASKS python ~/rockstar/rockstar-submit-L3N256.py $INDIR
 
 sbatch ~/run-consistent-dir.sh $INDIR/Rockstar
